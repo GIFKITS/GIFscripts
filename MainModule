@@ -1,1 +1,837 @@
-return {"Ok"}
+local ScriptParent = script.Parent
+local GameId = game.GameId
+local PlaceId = game.PlaceId
+--Loading--
+task.wait()
+if not game:IsLoaded() then
+	game.Loaded:Wait()
+end
+
+--Services--
+local Services = {
+	Players = game:GetService("Players"),
+	Marketplace = game:GetService("MarketplaceService"),
+	UserInput = game:GetService("UserInputService"),
+	Tween = game:GetService("TweenService"),
+	Debris = game:GetService("Debris"),
+}
+
+--Window--
+local WindowFont = Enum.Font.Highway
+
+local GifUILib = {
+	Elements = {},
+	Connections = {},
+	ThemeObjects = {},
+}
+
+--Player--
+local Player = Services.Players.LocalPlayer
+local PlayerGui = Player.PlayerGui
+
+--MAIN Gui--
+local DFparent = nil
+if ScriptParent==nil then
+	DFparent = game.CoreGui
+else
+	DFparent = PlayerGui
+end
+
+local GifUI = Instance.new("ScreenGui")
+GifUI.Parent = DFparent
+GifUI.ResetOnSpawn = false
+GifUI.Name = "GifUI"
+GifUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+--MAIN Functions--
+function GifUILib:IsRunning()
+	return GifUI.Parent == DFparent
+end
+
+task.spawn(function()
+	while (GifUILib:IsRunning()) do
+		wait()
+	end
+	for _,Connection:RBXScriptConnection in pairs(GifUILib.Connections) do
+		Connection:Disconnect()
+	end
+end)
+
+local function AddConnection(Trigger,Function)
+	if (not GifUILib:IsRunning()) then return end
+	local TriggerConnect = Trigger:Connect(Function)
+	table.insert(GifUILib.Connections,TriggerConnect)
+	return TriggerConnect
+end
+
+function GifUILib:Exit()
+	GifUI:Destroy()
+end
+
+--Functions--
+local function PlaySound(ID:string)
+	if not ID then return end
+	local NormalID = "rbxassetid://"..tostring(ID)
+	--
+	local Sound = Instance.new("Sound",script)
+	Sound.Name = "Sound"
+	Sound.SoundId = NormalID
+	Services.Debris:AddItem(Sound,Sound.TimeLength+1)
+	Sound:Play()
+end
+local function ClickSound(Object:GuiButton)
+	AddConnection(Object.MouseButton1Click,function()
+		PlaySound("452267918")
+	end)
+end
+local function TypingSound(Object:TextBox)
+	AddConnection(Object.Changed,function(Property)
+		if Property~="Text" then return end
+		PlaySound("9116156872")
+	end)
+end
+local function SetProp(Object, Properties)
+	for PropertyName, Property in next, Properties or {} do
+		Object[PropertyName] = Property
+	end
+	return Object
+end
+local function SetChildren(Element, Children)
+	for _,Child in pairs(Children) do
+		Child.Parent = Element
+	end
+	return Element
+end
+local function Create(Name, Properties, Children)
+	local Object = Instance.new(Name)
+	SetProp(Object,Properties)
+	for _,Child in next, Children or {} do
+		Child.Parent = Object
+	end
+	return Object
+end
+local function CreateElement(Name,Function)
+	GifUILib.Elements[Name] = function(...)
+		return Function(...)
+	end
+end
+local function MakeElement(Name,...)
+	local NewElement = GifUILib.Elements[Name](...)
+	return NewElement
+end
+
+local function MakeDraggable(DragPoint, Main)
+	local Dragging = false
+	local DragInput = nil
+	local MousePos = nil
+	local FramePos = nil
+	
+	AddConnection(DragPoint.InputBegan, function(Input)
+		if Input.UserInputType~=Enum.UserInputType.MouseButton1 and Input.UserInputType~=Enum.UserInputType.Touch then return end
+		Dragging = true
+		MousePos = Input.Position
+		FramePos = Main.Position
+		Input.Changed:Connect(function()
+			if Input.UserInputState~=Enum.UserInputState.End then return end
+			Dragging = false
+		end)
+	end)
+	AddConnection(DragPoint.InputChanged, function(Input)
+		if Input.UserInputType~=Enum.UserInputType.MouseMovement and Input.UserInputType~=Enum.UserInputType.Touch then return end
+		DragInput = Input
+	end)
+	AddConnection(Services.UserInput.InputChanged, function(Input)
+		if Input == DragInput and Dragging then
+			local Delta = Input.Position - MousePos
+			Services.Tween:Create(Main, TweenInfo.new(0.05, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position  = UDim2.new(FramePos.X.Scale,FramePos.X.Offset + Delta.X, FramePos.Y.Scale, FramePos.Y.Offset + Delta.Y)}):Play()
+			Main.Position  = UDim2.new(FramePos.X.Scale,FramePos.X.Offset + Delta.X, FramePos.Y.Scale, FramePos.Y.Offset + Delta.Y)
+		end
+	end)
+end    
+
+--Elements--
+CreateElement("Corner", function(Scale, Offset)
+	local Corner = Create("UICorner", {
+		CornerRadius = UDim.new(Scale or 0, Offset or 0)
+	})
+	return Corner
+end)
+
+CreateElement("Stroke", function(Color, Thickness)
+	local Stroke = Create("UIStroke", {
+		Color = Color or Color3.fromRGB(255, 255, 255),
+		Thickness = Thickness or 1,
+		ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	})
+	return Stroke
+end)
+
+CreateElement("List", function(Scale, Offset)
+	local List = Create("UIListLayout", {
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Padding = UDim.new(Scale or 0, Offset or 0)
+	})
+	return List
+end)
+
+CreateElement("Constraint", function(Ratio)
+	local Constraint = Create("UIAspectRatioConstraint", {
+		AspectRatio = Ratio
+	})
+	return Constraint
+end)
+
+CreateElement("Frame", function(Color)
+	local Frame = Create("Frame", {
+		BackgroundColor3 = Color or Color3.fromRGB(255, 255, 255),
+		BorderSizePixel = 0
+	})
+	return Frame
+end)
+
+CreateElement("CanvasGroup", function(Color)
+	local Frame = Create("CanvasGroup", {
+		BackgroundColor3 = Color or Color3.fromRGB(255, 255, 255),
+		BorderSizePixel = 0
+	})
+	return Frame
+end)
+
+CreateElement("Button", function(Color)
+	local Button = Create("TextButton", {
+		Text = "",
+		AutoButtonColor = false,
+		BackgroundColor3 = Color or Color3.fromRGB(255, 255, 255),
+		BorderSizePixel = 0
+	})
+	return Button
+end)
+
+CreateElement("ScrollFrame", function(Color, Width)
+	local ScrollFrame = Create("ScrollingFrame", {
+		BackgroundTransparency = 1,
+		MidImage = "rbxassetid://7445543667",
+		BottomImage = "rbxassetid://7445543667",
+		TopImage = "rbxassetid://7445543667",
+		ScrollBarImageColor3 = Color,
+		BorderSizePixel = 0,
+		ScrollBarThickness = Width,
+		AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		CanvasSize = UDim2.new(0, 0, 0, 0)
+	})
+	return ScrollFrame
+end)
+
+CreateElement("TextBox", function(Text, TextSide)
+	local ScrollFrame = Create("TextBox", {
+		PlaceholderColor3 = Color3.fromRGB(140, 140, 140),
+		PlaceholderText = Text,
+		TextColor3 = Color3.fromRGB(255, 255, 255),
+		TextScaled = true,
+		Text = "",
+		Font = WindowFont,
+		TextXAlignment = TextSide or Enum.TextXAlignment.Center
+	})
+	return ScrollFrame
+end)
+
+CreateElement("Image", function(ImageID)
+	local ImageNew = Create("ImageLabel", {
+		Image = "http://www.roblox.com/asset/?id="..ImageID,
+		BackgroundTransparency = 1
+	})
+	return ImageNew
+end)
+
+CreateElement("Label", function(Text, TextSide)
+	local Label = Create("TextLabel", {
+		Text = Text or "",
+		TextColor3 = Color3.fromRGB(255, 255, 255),
+		TextScaled = true,
+		Font = WindowFont,
+		BackgroundTransparency = 1,
+		TextXAlignment = TextSide or Enum.TextXAlignment.Center
+	})
+	return Label
+end)
+
+--Move Cursor In First Person--
+local UnlockCursorKey = Enum.KeyCode.LeftAlt
+local UnlockCursor:TextButton = SetProp(MakeElement("Button"),{
+	BackgroundTransparency = 1,
+	Size = UDim2.fromScale(0,0),
+	Position = UDim2.fromScale(0,0),
+	Parent = GifUI,
+})
+Services.UserInput.InputBegan:Connect(function(Key)
+	if Key.KeyCode~=UnlockCursorKey then return end
+	UnlockCursor.Modal = true
+end)
+Services.UserInput.InputEnded:Connect(function(Key)
+	if Key.KeyCode~=UnlockCursorKey then return end
+	UnlockCursor.Modal = false
+end)
+
+--Making Window---
+local HasWindow = false
+function GifUILib:MakeWindow(WindowConfig)
+	if HasWindow then warn("Alredy Have Window!") ;return end
+	--Window--
+	HasWindow = true
+	local Window = {
+		Tabs = {},
+		CurrentTab = nil,
+	}
+	local WindowFrame = SetProp(MakeElement("CanvasGroup",Color3.fromRGB(30, 30, 30)),{
+		Size = UDim2.fromScale(.75,.508),
+		Position = UDim2.fromScale(.5,.5),
+		AnchorPoint = Vector2.new(.5,.5),
+		Parent = GifUI,
+		BackgroundTransparency = 1,
+		Name = "Window",
+	})
+	MakeElement("Corner",.04).Parent = WindowFrame
+	MakeElement("Constraint",1.668).Parent = WindowFrame
+	
+	--Window Main--
+	local WindowMain:CanvasGroup = SetProp(MakeElement("CanvasGroup",Color3.fromRGB(30, 30, 30)),{
+		Size = UDim2.fromScale(1,.862),
+		Position = UDim2.fromScale(.5,.572),
+		AnchorPoint = Vector2.new(.5,.5),
+		Parent = WindowFrame,
+		BackgroundTransparency = 0,
+		Name = "Main",
+	})
+	
+	--Top Bar--
+	local TopBar = SetProp(MakeElement("CanvasGroup",Color3.fromRGB(30, 30, 30)),{
+		Size = UDim2.fromScale(1,.141),
+		Position = UDim2.fromScale(.5,0),
+		AnchorPoint = Vector2.new(.5,0),
+		Parent = WindowFrame,
+		BackgroundTransparency = 0,
+		Name = "TopBar",
+	})
+	MakeDraggable(TopBar,WindowFrame)
+	MakeElement("Stroke",Color3.fromRGB(80, 80, 80)).Parent = TopBar
+	local WindowTitle = SetProp(MakeElement("Label",WindowConfig.WindowTitle,"Left"),{
+		Size = UDim2.fromScale(.541,.4),
+		Position = UDim2.fromScale(.028,.5),
+		AnchorPoint = Vector2.new(0,.5),
+		Parent = TopBar,
+		Name = "Title",
+	})
+	local CloseButton:TextButton = SetProp(MakeElement("Button",Color3.fromRGB(38, 38, 38)),{
+		Size = UDim2.fromScale(.059,.698),
+		Position = UDim2.fromScale(.955,.5),
+		AnchorPoint = Vector2.new(.5,.5),
+		Parent = TopBar,
+		BackgroundTransparency = 0,
+		Name = "CloseButton",
+	})
+	MakeElement("Stroke",Color3.fromRGB(255, 255, 255)).Parent = CloseButton
+	MakeElement("Corner",.2).Parent = CloseButton
+	MakeElement("Constraint",1).Parent = CloseButton
+	SetProp(MakeElement("Image","16423157073"),{
+		Size = UDim2.fromScale(.55,.55),
+		Position = UDim2.fromScale(.5,.5),
+		AnchorPoint = Vector2.new(.5,.5),
+		Parent = CloseButton,
+		Name = "Image",
+	})
+	AddConnection(CloseButton.MouseButton1Click,function()
+		GifUI:Destroy()
+		task.wait(.01)
+		script:Destroy()
+	end)
+	local CollapseButton:TextButton = SetProp(MakeElement("Button",Color3.fromRGB(38, 38, 38)),{
+		Size = UDim2.fromScale(.059,.698),
+		Position = UDim2.fromScale(.884,.5),
+		AnchorPoint = Vector2.new(.5,.5),
+		Parent = TopBar,
+		BackgroundTransparency = 0,
+		Name = "CollapseButton",
+	})
+	MakeElement("Stroke",Color3.fromRGB(255, 255, 255)).Parent = CollapseButton
+	MakeElement("Corner",.2).Parent = CollapseButton
+	MakeElement("Constraint",1).Parent = CollapseButton
+	local CollapseArrow = SetProp(MakeElement("Image","104232909138558"),{
+		Size = UDim2.fromScale(.8,.8),
+		Position = UDim2.fromScale(.5,.5),
+		AnchorPoint = Vector2.new(.5,.5),
+		Parent = CollapseButton,
+		Name = "Image",
+	})
+	local Collapsed = false
+	local CollapseTime = .5
+	AddConnection(CollapseButton.MouseButton1Click,function()
+		if not Collapsed then Collapsed = true
+			CollapseButton.Interactable = false
+			WindowMain:TweenPosition(UDim2.fromScale(WindowMain.Position.X.Scale,-.428),
+				Enum.EasingDirection.In,
+				Enum.EasingStyle.Sine,
+				CollapseTime*1.5
+			)
+			Services.Tween:Create(CollapseArrow,TweenInfo.new(CollapseTime,Enum.EasingStyle.Linear),
+				{Rotation=180}
+			):Play()
+			wait(CollapseTime+.3)
+			CollapseButton.Interactable = true
+		else Collapsed = false
+			CollapseButton.Interactable = false
+			WindowMain:TweenPosition(UDim2.fromScale(WindowMain.Position.X.Scale,.572),
+				Enum.EasingDirection.In,
+				Enum.EasingStyle.Sine,
+				CollapseTime*1.5
+			)
+			Services.Tween:Create(CollapseArrow,TweenInfo.new(CollapseTime,Enum.EasingStyle.Linear),
+				{Rotation=0}
+			):Play()
+			wait(CollapseTime+.3)
+			CollapseButton.Interactable = true
+		end
+	end)
+	
+	--LeftBar
+	local LeftBar = SetProp(MakeElement("Frame",Color3.fromRGB(36, 36, 36)),{
+		Size = UDim2.fromScale(0.252,1),
+		Position = UDim2.fromScale(0,0),
+		AnchorPoint = Vector2.new(0,0),
+		Parent = WindowMain,
+		BackgroundTransparency = 0,
+		Name = "LeftBar",
+	})
+	MakeElement("Stroke",Color3.fromRGB(80, 80, 80)).Parent = LeftBar
+	--
+	local ProfileLabel = SetProp(MakeElement("Frame",Color3.fromRGB(36, 36, 36)),{
+		Size = UDim2.fromScale(1,.202),
+		Position = UDim2.fromScale(0,1),
+		AnchorPoint = Vector2.new(0,1),
+		Parent = LeftBar,
+		BackgroundTransparency = 1,
+		Name = "Profile",
+	})
+	MakeElement("Stroke",Color3.fromRGB(80, 80, 80)).Parent = ProfileLabel
+	--
+	local SearchLabel = SetProp(MakeElement("Frame",Color3.fromRGB(36, 36, 36)),{
+		Size = UDim2.fromScale(1,.202),
+		Position = UDim2.fromScale(.5,.101),
+		AnchorPoint = Vector2.new(.5,.5),
+		Parent = LeftBar,
+		BackgroundTransparency = 1,
+		Name = "Search",
+	})
+	MakeElement("Stroke",Color3.fromRGB(80, 80, 80)).Parent = SearchLabel
+	local SearchBG = SetProp(MakeElement("Frame",Color3.fromRGB(30, 30, 30)),{
+		Size = UDim2.fromScale(.8,.5),
+		Position = UDim2.fromScale(.5,.5),
+		AnchorPoint = Vector2.new(.5,.5),
+		Parent = SearchLabel,
+		BackgroundTransparency = 0,
+		Name = "Background",
+	})
+	MakeElement("Stroke",Color3.fromRGB(255, 255, 255)).Parent = SearchBG
+	MakeElement("Corner",.2,0).Parent = SearchBG
+	local Search:TextBox = SetProp(MakeElement("TextBox","Search Tabs"),{
+		Size = UDim2.fromScale(.8,.5),
+		Position = UDim2.fromScale(.5,.5),
+		AnchorPoint = Vector2.new(.5,.5),
+		Parent = SearchBG,
+		BackgroundTransparency = 1,
+		Name = "TextBox",
+	})
+	--
+	local TabsHandler = SetProp(MakeElement("ScrollFrame",Color3.fromRGB(80,80,80),3),{
+		Size = UDim2.fromScale(1,.596),
+		Position = UDim2.fromScale(.5,.5),
+		AnchorPoint = Vector2.new(.5,.5),
+		Parent = LeftBar,
+		BackgroundTransparency = 1,
+		Name = "TabsHandler",
+	})
+	SetProp(MakeElement("List",-.09),{
+		FillDirection = Enum.FillDirection.Vertical,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		VerticalAlignment = Enum.VerticalAlignment.Top,
+	}).Parent = TabsHandler
+	local Tab = SetProp(MakeElement("Frame"),{
+		Size = UDim2.fromScale(1,.322),
+		Position = UDim2.fromScale(0,0),
+		AnchorPoint = Vector2.new(0,0),
+		Parent = script,
+		BackgroundTransparency = 1,
+		Name = "Tab",
+	})
+	local TabButton = SetProp(MakeElement("Button",Color3.fromRGB(36, 36, 36)),{
+		Size = UDim2.fromScale(.8,.514),
+		Position = UDim2.fromScale(.5,.5),
+		AnchorPoint = Vector2.new(.5,.5),
+		Parent = Tab,
+		BackgroundTransparency = 0,
+		Name = "Button",
+	})
+	SetProp(MakeElement("Corner",.2)).Parent = TabButton
+	SetProp(MakeElement("Stroke")).Parent = TabButton
+	local TabTitle = SetProp(MakeElement("Label","Tab"),{
+		Size = UDim2.fromScale(1,.5),
+		Position = UDim2.fromScale(.5,.5),
+		AnchorPoint = Vector2.new(.5,.5),
+		Parent = TabButton,
+		Name = "Title",
+	})
+	--
+	local OptionsHandler = SetProp(MakeElement("ScrollFrame",Color3.fromRGB(80,80,80),3),{
+		Size = UDim2.fromScale(.748,1),
+		Position = UDim2.fromScale(.626,.5),
+		AnchorPoint = Vector2.new(.5,.5),
+		Parent = WindowMain,
+		BackgroundTransparency = 1,
+		Name = "OptionsHandler",
+	})
+	SetProp(MakeElement("List",-.1),{
+		FillDirection = Enum.FillDirection.Vertical,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		VerticalAlignment = Enum.VerticalAlignment.Top,
+	}).Parent = OptionsHandler
+	local Option = SetProp(MakeElement("Frame"),{
+		Size = UDim2.fromScale(1,.298),
+		Position = UDim2.fromScale(0,0),
+		AnchorPoint = Vector2.new(0,0),
+		Parent = script,
+		BackgroundTransparency = 1,
+		Name = "Option",
+	})
+	local OptionBG = SetProp(MakeElement("Frame",Color3.fromRGB(36, 36, 36)),{
+		Size = UDim2.fromScale(.897,.5),
+		Position = UDim2.fromScale(.5,.5),
+		AnchorPoint = Vector2.new(.5,.5),
+		Parent = Option,
+		BackgroundTransparency = 0,
+		Name = "Background",
+	})
+	SetProp(MakeElement("Corner",.2)).Parent = OptionBG
+	SetProp(MakeElement("Stroke",Color3.fromRGB(80, 80, 80))).Parent = OptionBG
+	local OptionTitle = SetProp(MakeElement("Label","Option","Left"),{
+		Size = UDim2.fromScale(.464,.5),
+		Position = UDim2.fromScale(.268,.5),
+		AnchorPoint = Vector2.new(.5,.5),
+		Parent = OptionBG,
+		Name = "Title",
+	})
+	local OptionCheckBox = SetProp(MakeElement("Button",Color3.fromRGB(80, 80, 80)),{
+		Size = UDim2.fromScale(.073,.64),
+		Position = UDim2.fromScale(.938,.5),
+		AnchorPoint = Vector2.new(.5,.5),
+		Parent = OptionBG,
+		BackgroundTransparency = 0,
+		Name = "CheckBox",
+	})
+	SetProp(MakeElement("Corner",.2)).Parent = OptionCheckBox
+	local CheckImage = SetProp(MakeElement("Image","12690727184"),{
+		Size = UDim2.fromScale(.6,.6),
+		Position = UDim2.fromScale(.5,.5),
+		AnchorPoint = Vector2.new(.5,.5),
+		Parent = OptionCheckBox,
+		BackgroundTransparency = 1,
+		Name = "Check",
+	})
+	CheckImage.ImageTransparency = 1
+	
+	--Functions--
+	task.spawn(function()
+		while (GifUILib:IsRunning()) do task.wait()
+			local CurrentTab = Window.CurrentTab
+			
+			local SearchText = string.lower(Search.Text)
+			for _,Object:Frame in pairs(TabsHandler:GetChildren()) do
+				if not Object:IsA("Frame") then continue end
+				if SearchText~="" then
+					local TabName = string.lower(Object.Name)
+					if string.find(TabName,SearchText) then
+						Object.Visible = true
+					else
+						Object.Visible = false
+					end
+				else
+					Object.Visible = true
+				end
+			end
+			
+			for _,Object in pairs(OptionsHandler:GetChildren()) do
+				if not Object:IsA("Frame") then continue end
+				Object.Visible = false
+			end
+
+			if not CurrentTab then continue end
+			for _,Object in pairs(Window.Tabs[CurrentTab].Options) do
+				if not Object:IsA("Frame") then continue end
+				Object.Visible = true
+			end
+			
+			CurrentTab.Interactable = false
+			CurrentTab.Button.Title.TextColor3 = Color3.fromRGB(80, 80, 80)
+			CurrentTab.Button.UIStroke.Color = Color3.fromRGB(80, 80, 80)
+		end
+	end)
+	
+	function Window:AddTab(TabTitle)
+		local NewTab = Tab:Clone()
+		NewTab.Button.Title.Text = tostring(TabTitle)
+		NewTab.Name = TabTitle
+		NewTab.Parent = TabsHandler
+		Window.Tabs[NewTab]={
+			Options = {},
+		}
+		local NewTabList = Window.Tabs[NewTab]
+		NewTabList.Tab = NewTab
+		
+		AddConnection(NewTab.Button.MouseButton1Click,function()
+			if Window.CurrentTab then
+				Window.CurrentTab.Button.Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+				Window.CurrentTab.Button.UIStroke.Color = Color3.fromRGB(255, 255, 255)
+				Window.CurrentTab.Interactable = true
+			end
+			Window.CurrentTab = NewTab
+		end)
+		function NewTabList:AddOption(OptionTitle, OptionType, Other)
+			local NewOption = Option:Clone()
+			NewOption.Background.Title.Text = tostring(OptionTitle)
+			NewOption.Name = OptionTitle
+			NewOption.Parent = OptionsHandler
+			table.insert(NewTabList.Options,NewOption)
+			local OptionTable = {}
+			local CheckBox:TextButton = NewOption.Background.CheckBox
+			
+			function OptionTable:Error()
+				local CrossImage = SetProp(MakeElement("Image","16423157073"),{
+					Size = UDim2.fromScale(.6,.6),
+					Position = UDim2.fromScale(.5,.5),
+					AnchorPoint = Vector2.new(.5,.5),
+					Parent = CheckBox,
+					BackgroundTransparency = 1,
+					ZIndex = 99999,
+					Name = "Cross",
+				})
+				local SavedColor = CheckBox.BackgroundColor3
+				CheckBox.Interactable = false
+				Services.Tween:Create(CrossImage,TweenInfo.new(.4,Enum.EasingStyle.Linear),{
+					ImageTransparency = 1,
+				}):Play()
+				CheckBox.BackgroundColor3 = Color3.fromRGB(221, 88, 90)
+				Services.Tween:Create(CheckBox,TweenInfo.new(.4,Enum.EasingStyle.Linear),{
+					BackgroundColor3 = SavedColor,
+				}):Play()
+				wait(.4)
+				CrossImage:Destroy()
+				CheckBox.Interactable = true
+			end
+			
+			if OptionType == "Switch" then
+				local Value = Instance.new("BoolValue",NewOption);Value.Value=false
+				local SwitchTime = .3
+				--
+				AddConnection(CheckBox.MouseButton1Click,function()
+					if not Value.Value then Value.Value = true
+						CheckBox.Interactable = false
+						Services.Tween:Create(CheckBox,TweenInfo.new(SwitchTime,Enum.EasingStyle.Linear),{
+							BackgroundColor3 = Color3.fromRGB(94,121,221),
+						}):Play()
+						Services.Tween:Create(CheckBox.Check,TweenInfo.new(SwitchTime,Enum.EasingStyle.Linear),{
+							ImageTransparency = 0,
+						}):Play()
+						wait(SwitchTime+.1)
+						CheckBox.Interactable = true
+					else Value.Value = false
+						CheckBox.Interactable = false
+						Services.Tween:Create(CheckBox,TweenInfo.new(SwitchTime,Enum.EasingStyle.Linear),{
+							BackgroundColor3 = Color3.fromRGB(80,80,80),
+						}):Play()
+						Services.Tween:Create(CheckBox.Check,TweenInfo.new(SwitchTime,Enum.EasingStyle.Linear),{
+							ImageTransparency = 1,
+						}):Play()
+						wait(SwitchTime+.1)
+						CheckBox.Interactable = true
+					end
+				end)
+				--
+				return {OptionTable,Value}
+				
+			elseif OptionType == "Click" then
+				CheckBox.Check.Image = "http://www.roblox.com/asset/?id=12333784627"
+				CheckBox.Check.Size = UDim2.fromScale(.9,.9)
+				CheckBox.Check.ImageTransparency = 0
+				local SwitchTime = .3
+				--
+				AddConnection(NewOption.Background.CheckBox.MouseButton1Click,function()
+					CheckBox.Interactable = false
+					CheckBox.BackgroundColor3 = Color3.fromRGB(94,121,221)
+					Services.Tween:Create(CheckBox,TweenInfo.new(SwitchTime,Enum.EasingStyle.Linear),{
+						BackgroundColor3 = Color3.fromRGB(80,80,80),
+					}):Play()
+					wait(SwitchTime+.1)
+					CheckBox.Interactable = true
+				end)
+				--
+				return {OptionTable,CheckBox}
+				
+			elseif OptionType == "SwitchInput" then
+				CheckBox.Position = UDim2.fromScale(.685,.5)
+				local OptionTextBox = SetProp(MakeElement("TextBox",Other),{
+					Size = UDim2.fromScale(.228,.64),
+					Position = UDim2.fromScale(.861,.5),
+					AnchorPoint = Vector2.new(.5,.5),
+					Parent = NewOption.Background,
+					BackgroundTransparency = 0,
+					BackgroundColor3 = Color3.fromRGB(80, 80, 80),
+					Name = "TextBox",
+				})
+				SetProp(MakeElement("Corner",.2)).Parent = OptionTextBox
+				--
+				local Value = Instance.new("BoolValue",NewOption);Value.Value=false
+				local SwitchTime = .3
+				--
+				AddConnection(NewOption.Background.CheckBox.MouseButton1Click,function()
+					if OptionTextBox.Text=="" and not Value.Value then
+						OptionTable:Error()
+						return
+					end
+					if not Value.Value then Value.Value = true
+						CheckBox.Interactable = false
+						Services.Tween:Create(CheckBox,TweenInfo.new(SwitchTime,Enum.EasingStyle.Linear),{
+							BackgroundColor3 = Color3.fromRGB(94,121,221),
+						}):Play()
+						Services.Tween:Create(CheckBox.Check,TweenInfo.new(SwitchTime,Enum.EasingStyle.Linear),{
+							ImageTransparency = 0,
+						}):Play()
+						wait(SwitchTime+.1)
+						CheckBox.Interactable = true
+					else Value.Value = false
+						CheckBox.Interactable = false
+						Services.Tween:Create(CheckBox,TweenInfo.new(SwitchTime,Enum.EasingStyle.Linear),{
+							BackgroundColor3 = Color3.fromRGB(80,80,80),
+						}):Play()
+						Services.Tween:Create(CheckBox.Check,TweenInfo.new(SwitchTime,Enum.EasingStyle.Linear),{
+							ImageTransparency = 1,
+						}):Play()
+						wait(SwitchTime+.1)
+						CheckBox.Interactable = true
+					end
+				end)
+				--
+				return {OptionTable,Value,OptionTextBox}
+				
+			elseif OptionType == "ClickInput" then
+				local OptionTextBox = SetProp(MakeElement("TextBox",Other),{
+					Size = UDim2.fromScale(.228,.64),
+					Position = UDim2.fromScale(.861,.5),
+					AnchorPoint = Vector2.new(.5,.5),
+					Parent = NewOption.Background,
+					BackgroundTransparency = 0,
+					BackgroundColor3 = Color3.fromRGB(80, 80, 80),
+					Name = "TextBox",
+				})
+				SetProp(MakeElement("Corner",.2)).Parent = OptionTextBox
+				--
+				local SwitchTime = .3
+				--
+				CheckBox.Position = UDim2.fromScale(.685,.5)
+				CheckBox.Check.Image = "http://www.roblox.com/asset/?id=12333784627"
+				CheckBox.Check.Size = UDim2.fromScale(.9,.9)
+				CheckBox.Check.ImageTransparency = 0
+				--
+				AddConnection(NewOption.Background.CheckBox.MouseButton1Click,function()
+					if OptionTextBox.Text=="" then
+						OptionTable:Error()
+						return
+					end
+					CheckBox.Interactable = false
+					CheckBox.BackgroundColor3 = Color3.fromRGB(94,121,221)
+					Services.Tween:Create(CheckBox,TweenInfo.new(SwitchTime,Enum.EasingStyle.Linear),{
+						BackgroundColor3 = Color3.fromRGB(80,80,80),
+					}):Play()
+					wait(SwitchTime+.1)
+					CheckBox.Interactable = true
+				end)
+				--
+				return {OptionTable,CheckBox,OptionTextBox}
+				
+			elseif OptionType == "Input" then
+				local OptionTextBox:TextBox = SetProp(MakeElement("TextBox",Other),{
+					Size = UDim2.fromScale(.228,.64),
+					Position = UDim2.fromScale(.861,.5),
+					AnchorPoint = Vector2.new(.5,.5),
+					Parent = NewOption.Background,
+					BackgroundTransparency = 0,
+					BackgroundColor3 = Color3.fromRGB(80, 80, 80),
+					Name = "TextBox",
+				})
+				SetProp(MakeElement("Corner",.2)).Parent = OptionTextBox
+				CheckBox:Destroy()
+				
+				OptionTextBox.Changed:Connect(function(Property)
+					if Property~="Text" then return end
+					OptionTextBox.BackgroundColor3 = Color3.fromRGB(94,121,221)
+					Services.Tween:Create(OptionTextBox,TweenInfo.new(.3,Enum.EasingStyle.Linear),{
+						BackgroundColor3 = Color3.fromRGB(80,80,80),
+					}):Play()
+				end)
+				
+				return OptionTextBox
+				
+			elseif OptionType == "Label" then
+				local FrameTitle:TextLabel = NewOption.Background.Title
+				FrameTitle.Parent = NewOption
+				NewOption.Background:Destroy()
+				FrameTitle.Size = UDim2.fromScale(.88,.389)
+				FrameTitle.Position = UDim2.fromScale(.5,.5)
+				NewOption.Size = UDim2.fromScale(1,.191)
+				if Other then
+					FrameTitle.TextXAlignment = Other
+				end
+				return FrameTitle
+			end
+		end
+		function NewTabList:MakeSpace()
+			local Space = SetProp(MakeElement("Frame"),{
+				Parent = OptionsHandler,
+				BackgroundTransparency = 1,
+				Position = UDim2.fromScale(0,0),
+				Size = UDim2.fromScale(.214,.186),
+			})
+			table.insert(NewTabList.Options,Space)
+			return Space
+		end
+		
+		return NewTabList
+	end
+	
+	function Window:SetTab(Tab)
+		if Window.CurrentTab then
+			Window.CurrentTab.Button.Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+			Window.CurrentTab.Button.UIStroke.Color = Color3.fromRGB(255, 255, 255)
+			Window.CurrentTab.Interactable = true
+		end
+		Window.CurrentTab = Tab
+	end
+	
+	--Click Sounds--
+	for _,Object in pairs(GifUI:GetDescendants()) do
+		if Object:IsA("GuiButton") then
+			ClickSound(Object)
+		elseif Object:IsA("TextBox") then
+			TypingSound(Object)
+		end
+	end
+	GifUI.DescendantAdded:Connect(function(Decendant)
+		if Decendant:IsA("GuiButton") then
+			ClickSound(Decendant)
+		elseif Decendant:IsA("TextBox") then
+			TypingSound(Decendant)
+		end
+	end)
+	
+	return Window
+end
+
+--Return--
+return GifUILib
