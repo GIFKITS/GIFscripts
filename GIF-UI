@@ -244,8 +244,8 @@ function GifUI_lib:MakeWindow(Configs)
 		Draggable = false
 	end)
 	
-	Services.Input.InputChanged:Connect(function(Input,Event)
-		if Event or not Draggable then return end
+	Services.Input.InputChanged:Connect(function(Input)
+		if not Draggable then return end
 		--
 		local NewPosition = FramePosition + ((Vector2.new(Input.Position.X,Input.Position.Y) - MousePosition) / workspace.CurrentCamera.ViewportSize)
 		WindowHandler.Position = UDim2.fromScale(NewPosition.X, NewPosition.Y)
