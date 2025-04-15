@@ -3,6 +3,7 @@ if not game:IsLoaded() then game.Loaded:Wait() end
 local Services = {
 	Players = game:GetService("Players"),
 	Input = game:GetService("UserInputService"),
+	Tween = game:GetService("TweenService"),
 }
 
 local GifUI_lib = {
@@ -34,10 +35,22 @@ spawn(function()
 		wait()
 	end
 	--
+	print("ok")
 	for _,Connect in next, GifUI_lib.Connections do
 		Connect:Disconnect()
 	end
 end)
+
+-- Other
+
+function AddConnection(Signal, Function)
+	if (not IsRunning()) then return end
+	--
+	local Connect = Signal:Connect(Function)
+	table.insert(GifUI_lib.Connections,Connect)
+	--
+	return Connect
+end
 
 --===============================================
 
@@ -230,7 +243,7 @@ function GifUI_lib:MakeWindow(Configs)
 	local FramePosition = nil
 	local Draggable = false
 	
-	WindowTopBar.InputBegan:Connect(function(Input)
+	AddConnection(WindowTopBar.InputBegan, function(Input)
 		if Input.UserInputType~=Enum.UserInputType.MouseButton1 and Input.UserInputType~=Enum.UserInputType.Touch then return end
 		--
 		Draggable = true
@@ -238,13 +251,13 @@ function GifUI_lib:MakeWindow(Configs)
 		FramePosition = Vector2.new(WindowHandler.Position.X.Scale,WindowHandler.Position.Y.Scale)
 	end)
 	
-	WindowTopBar.InputEnded:Connect(function(Input)
+	AddConnection(WindowTopBar.InputEnded, function(Input)
 		if Input.UserInputType~=Enum.UserInputType.MouseButton1 and Input.UserInputType~=Enum.UserInputType.Touch then return end
 		--
 		Draggable = false
 	end)
 	
-	Services.Input.InputChanged:Connect(function(Input)
+	AddConnection(Services.Input.InputChanged, function(Input)
 		if not Draggable then return end
 		--
 		local NewPosition = FramePosition + ((Vector2.new(Input.Position.X,Input.Position.Y) - MousePosition) / workspace.CurrentCamera.ViewportSize)
@@ -260,6 +273,51 @@ function GifUI_lib:MakeWindow(Configs)
 		Size = UDim2.fromScale(.664,.5),
 		AnchorPoint = Vector2.new(0,.5),
 	})
+	
+	local TweenTime = .25
+	--
+	local DestroyButton:ImageButton = SetChildren(SetProperties(MakeElement("Button",Color3.fromRGB(229,64,67),nil,.4),{
+		Parent = WindowTopBar,
+		--
+		Position = UDim2.fromScale(.945,.5),
+		Size = UDim2.fromScale(.038,.534),
+		AnchorPoint = Vector2.new(0,.5),
+	}),{
+		MakeElement("Ratio",1)
+	})
+	
+	AddConnection(DestroyButton.MouseButton1Click, function()
+		Title.Text = "Disconnecting..."
+		task.wait(.05)
+		GifUI.Parent = nil -- Break All Functions 😎
+	end)
+	
+	local HideButton:ImageButton = SetChildren(SetProperties(MakeElement("Button",Color3.fromRGB(150,150,150),nil,.4),{
+		Parent = WindowTopBar,
+		--
+		Position = UDim2.fromScale(.88,.5),
+		Size = UDim2.fromScale(.05,.285),
+		AnchorPoint = Vector2.new(0,.5),
+	}),{
+		MakeElement("Ratio",2.5)
+	})
+	
+	local WindowHidden = false
+	local HideDb = false
+	AddConnection(HideButton.MouseButton1Click, function()
+		if HideDb then return end
+		HideDb = true
+		--
+		if WindowHidden then
+			Services.Tween:Create(WindowMain,TweenInfo.new(TweenTime,Enum.EasingStyle.Sine,Enum.EasingDirection.Out),{Position=UDim2.fromScale(.5,.56)}):Play()
+		else
+			Services.Tween:Create(WindowMain,TweenInfo.new(TweenTime,Enum.EasingStyle.Sine,Enum.EasingDirection.Out),{Position=UDim2.fromScale(.5,-.442)}):Play()
+		end
+		--
+		task.wait(TweenTime)
+		WindowHidden = not WindowHidden
+		HideDb = false
+	end)
 	
 	-- Tabs Gui
 	
