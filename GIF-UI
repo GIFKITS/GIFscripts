@@ -258,7 +258,7 @@ function GifUI_lib:MakeWindow(Configs)
 	end)
 	
 	AddConnection(Services.Input.InputChanged, function(Input)
-		if not Draggable then return end
+		if not Draggable or (Input.UserInputType~=Enum.UserInputType.MouseMovement and Input.UserInputType~=Enum.UserInputType.Touch) then return end
 		--
 		local NewPosition = FramePosition + ((Vector2.new(Input.Position.X,Input.Position.Y) - MousePosition) / workspace.CurrentCamera.ViewportSize)
 		WindowHandler.Position = UDim2.fromScale(NewPosition.X, NewPosition.Y)
