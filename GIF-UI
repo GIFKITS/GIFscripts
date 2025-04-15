@@ -1,0 +1,279 @@
+if not game:IsLoaded() then game.Loaded:Wait() end
+
+local Services = {
+	Players = game:GetService("Players"),
+	Input = game:GetService("UserInputService"),
+}
+
+local GifUI_lib = {
+	Elements = {},
+	Connections = {},
+	--
+	MainFont = Enum.Font.Highway,
+}
+
+local Player = Services.Players.LocalPlayer
+local PlayerGui = Player.PlayerGui
+
+local RealParent = game:FindFirstChild("CoreGui") or PlayerGui
+--
+local GifUI = Instance.new("ScreenGui", RealParent)
+GifUI.Name = "GifUI"
+GifUI.IgnoreGuiInset = true
+GifUI.ResetOnSpawn = false
+GifUI.DisplayOrder = 999999
+GifUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Break
+function IsRunning()
+	return GifUI:IsDescendantOf(RealParent)
+end
+
+spawn(function()
+	while (IsRunning()) do
+		wait()
+	end
+	--
+	for _,Connect in next, GifUI_lib.Connections do
+		Connect:Disconnect()
+	end
+end)
+
+--===============================================
+
+-- Functions
+function CreateObject(Name:string, Properties, Children)
+	--
+	local Object = Instance.new(Name)
+	for Property, Value in next, Properties or {} do
+		--
+		Object[Property] = Value
+	end
+	--
+	for _,Child in next, Children or {} do
+		--
+		Child.Parent = Object
+	end
+	--
+	return Object
+end
+
+function AddElement(Name:string, Function)
+	--
+	GifUI_lib.Elements[Name] = function(...)
+		return Function(...)
+	end
+end
+
+function MakeElement(Name:string, ...)
+	--
+	local Element = GifUI_lib.Elements[Name](...)
+	return Element
+end
+
+function SetProperties(Object, Properties)
+	--
+	for Property, Value in next, Properties or {} do
+		--
+		Object[Property] = Value
+	end
+	return Object
+end
+
+function SetChildren(Object, Children)
+	--
+	for _,Child in next, Children or {} do
+		--
+		Child.Parent = Object
+	end
+	return Object
+end
+
+--===============================================
+
+-- Elements
+AddElement("Frame",function(Color, CornerSize)
+	local Object = CreateObject("Frame",{
+		--
+		BackgroundColor3 = Color or Color3.fromRGB(255, 255, 255),
+		BorderSizePixel = 0,
+	},{
+		CreateObject("UICorner",{
+			CornerRadius = UDim.new(CornerSize or 0, 0),
+		})
+	})
+	return Object
+end)
+--
+AddElement("Canvas",function(Color, Transparency, CornerSize)
+	local Object = CreateObject("CanvasGroup",{
+		--
+		BackgroundColor3 = Color or Color3.fromRGB(255, 255, 255),
+		BackgroundTransparency = Transparency or 1,
+		BorderSizePixel = 0,
+	},{
+		CreateObject("UICorner",{
+			CornerRadius = UDim.new(CornerSize or 0, 0),
+		})
+	})
+	return Object
+end)
+--
+AddElement("Button",function(Color, Transparency, CornerSize)
+	local Object = CreateObject("ImageButton",{
+		--
+		BackgroundColor3 = Color or Color3.fromRGB(255, 255, 255),
+		BackgroundTransparency = Transparency or 0,
+		BorderSizePixel = 0,
+		AutoButtonColor = false,
+		ImageTransparency = 1,
+	}, {
+		CreateObject("UICorner",{
+			CornerRadius = UDim.new(CornerSize or 0, 0),
+		})
+	})
+	return Object
+end)
+--
+AddElement("Scroll",function()
+	local Object = CreateObject("ScrollingFrame",{
+		--
+		BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		--
+		BottomImage = "rbxassetid://13993227947",
+		MidImage = "rbxassetid://13993227947",
+		TopImage = "rbxassetid://13993227947",
+		ScrollBarImageTransparency = 0,
+		ScrollBarThickness = 1,
+		AutomaticCanvasSize = Enum.AutomaticSize.Y,
+		CanvasSize = UDim2.new(0,0,0,0),
+	})
+	return Object
+end)
+--
+AddElement("Text",function(Text, TextXAl, Color)
+	local Object = CreateObject("TextLabel",{
+		--
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		TextColor3 = Color or Color3.fromRGB(255, 255, 255),
+		Text = Text or "Text",
+		Font = GifUI_lib.MainFont,
+		TextScaled = true,
+		TextXAlignment = TextXAl or Enum.TextXAlignment.Left,
+	})
+	return Object
+end)
+--
+AddElement("Stroke",function(Color)
+	local Object = CreateObject("UIStroke",{
+		--
+		Color = Color or Color3.fromRGB(255, 255, 255),
+		Thickness = 1,
+		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+	})
+	return Object
+end)
+--
+AddElement("Ratio",function(Aspect)
+	local Object = CreateObject("UIAspectRatioConstraint",{
+		--
+		AspectRatio = Aspect or 1,
+		AspectType = Enum.AspectType.FitWithinMaxSize,
+		DominantAxis = Enum.DominantAxis.Width,
+	})
+	return Object
+end)
+
+--===============================================
+
+function GifUI_lib:MakeWindow(Configs)
+	if not Configs then warn("ERROR: YOU HAVE NOT ADDED A WINDOW CONFIGURATION!") return end
+	--
+	local Window = {}
+	
+	-- Window Main
+	
+	local WindowHandler:CanvasGroup = SetChildren(SetProperties(MakeElement("Canvas",nil,1,0.05),{
+		Parent = GifUI,
+		--
+		Position = UDim2.fromScale(.5,.5),
+		Size = UDim2.fromScale(.54,.393),
+		AnchorPoint = Vector2.new(.5,.5),
+	}),{
+		MakeElement("Ratio",1.697)
+	})
+	
+	local WindowMain = SetProperties(MakeElement("Frame",Color3.fromRGB(30,30,30)),{
+		Parent = WindowHandler,
+		--
+		Position = UDim2.fromScale(.5,.56),
+		Size = UDim2.fromScale(1,.88),
+		AnchorPoint = Vector2.new(.5,.5),
+	})
+	
+	-- Top Bar
+	
+	local WindowTopBar:Frame = SetChildren(SetProperties(MakeElement("Frame",Color3.fromRGB(25,25,25)),{
+		Parent = WindowHandler,
+		--
+		Position = UDim2.fromScale(.5,0),
+		Size = UDim2.fromScale(1,.12),
+		AnchorPoint = Vector2.new(.5,0),
+	}),{
+		MakeElement("Stroke",Color3.fromRGB(50,50,50))
+	})
+	
+	local MousePosition = nil
+	local FramePosition = nil
+	local Draggable = false
+	
+	WindowTopBar.InputBegan:Connect(function(Input)
+		if Input.UserInputType~=Enum.UserInputType.MouseButton1 and Input.UserInputType~=Enum.UserInputType.Touch then return end
+		--
+		Draggable = true
+		MousePosition = Vector2.new(Input.Position.X,Input.Position.Y)
+		FramePosition = Vector2.new(WindowHandler.Position.X.Scale,WindowHandler.Position.Y.Scale)
+	end)
+	
+	WindowTopBar.InputEnded:Connect(function(Input)
+		if Input.UserInputType~=Enum.UserInputType.MouseButton1 and Input.UserInputType~=Enum.UserInputType.Touch then return end
+		--
+		Draggable = false
+	end)
+	
+	Services.Input.InputChanged:Connect(function(Input,Event)
+		if Event or not Draggable then return end
+		--
+		local NewPosition = FramePosition + ((Vector2.new(Input.Position.X,Input.Position.Y) - MousePosition) / workspace.CurrentCamera.ViewportSize)
+		WindowHandler.Position = UDim2.fromScale(NewPosition.X, NewPosition.Y)
+	end)
+	
+	--
+	
+	local Title = SetProperties(MakeElement("Text",Configs.Title or "GIF-UI | Gui"),{
+		Parent = WindowTopBar,
+		--
+		Position = UDim2.fromScale(.025,.5),
+		Size = UDim2.fromScale(.664,.5),
+		AnchorPoint = Vector2.new(0,.5),
+	})
+	
+	-- Tabs Gui
+	
+	local Tabs = SetChildren(SetProperties(MakeElement("Scroll"),{
+		Parent = WindowMain,
+		--
+		Position = UDim2.fromScale(0,.5),
+		Size = UDim2.fromScale(.25,1),
+		AnchorPoint = Vector2.new(0,.5),
+	}),{
+		MakeElement("Stroke",Color3.fromRGB(50,50,50))
+	})
+	
+	return Window
+end
+
+return GifUI_lib
