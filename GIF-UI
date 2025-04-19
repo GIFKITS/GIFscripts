@@ -35,7 +35,6 @@ spawn(function()
 		wait()
 	end
 	--
-	print("ok")
 	for _,Connect in next, GifUI_lib.Connections do
 		Connect:Disconnect()
 	end
@@ -180,6 +179,17 @@ AddElement("Text",function(Text, TextXAl, Color)
 	return Object
 end)
 --
+AddElement("Image",function(ImageID, Transparency)
+	local Object:ImageLabel = CreateObject("ImageLabel",{
+		--
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Image = ImageID,
+		ImageTransparency = Transparency,
+	})
+	return Object
+end)
+--
 AddElement("Stroke",function(Color)
 	local Object = CreateObject("UIStroke",{
 		--
@@ -199,11 +209,28 @@ AddElement("Ratio",function(Aspect)
 	})
 	return Object
 end)
+--
+AddElement("List",function(Padding)
+	local Object = CreateObject("UIListLayout",{
+		--
+		Padding = UDim.new(Padding or 0, 0),
+		SortOrder = Enum.SortOrder.LayoutOrder,
+	})
+	return Object
+end)
+--
+AddElement("Corner",function(CornerSize)
+	local Object = CreateObject("UICorner",{
+		--
+		CornerRadius = UDim.new(CornerSize or 0, 0),
+	})
+	return Object
+end)
 
 --===============================================
 
-function GifUI_lib:MakeWindow(Configs)
-	if not Configs then warn("ERROR: YOU HAVE NOT ADDED A WINDOW CONFIGURATION!") return end
+function GifUI_lib:MakeWindow(WindowConfig)
+	if not WindowConfig then warn("ERROR: YOU HAVE NOT ADDED A WINDOW CONFIGURATION!") return end
 	--
 	local Window = {}
 	
@@ -266,7 +293,7 @@ function GifUI_lib:MakeWindow(Configs)
 	
 	--
 	
-	local Title = SetProperties(MakeElement("Text",Configs.Title or "GIF-UI | Gui"),{
+	local Title = SetProperties(MakeElement("Text",WindowConfig.Title or "GIF-UI | Gui"),{
 		Parent = WindowTopBar,
 		--
 		Position = UDim2.fromScale(.025,.5),
@@ -328,9 +355,213 @@ function GifUI_lib:MakeWindow(Configs)
 		Size = UDim2.fromScale(.25,1),
 		AnchorPoint = Vector2.new(0,.5),
 	}),{
-		MakeElement("Stroke",Color3.fromRGB(50,50,50))
+		MakeElement("Stroke",Color3.fromRGB(50,50,50)),
+		MakeElement("List",-0.03)
 	})
 	
+	local Tab = SetChildren(SetProperties(MakeElement("Frame"),{
+		Parent = script,
+		--
+		Position = UDim2.fromScale(0,0),
+		Size = UDim2.fromScale(1,.225),
+		AnchorPoint = Vector2.new(.5,.5),
+		--
+		BackgroundTransparency = 1,
+	}),{
+		SetChildren(SetProperties(MakeElement("Button",nil,1,.3),{
+			Position = UDim2.fromScale(.5,.5),
+			Size = UDim2.fromScale(.831,.568),
+			AnchorPoint = Vector2.new(.5,.5),
+		}),{
+			MakeElement("Stroke",Color3.fromRGB(100,100,100)),
+			--
+			SetProperties(MakeElement("Text","Tab",Enum.TextXAlignment.Center),{
+				Position = UDim2.fromScale(.5,.5),
+				Size = UDim2.fromScale(.5,.5),
+				AnchorPoint = Vector2.new(.5,.5),
+				--
+			})
+		})
+	})
+	
+	--Options Gui
+	
+	local Options = SetChildren(SetProperties(MakeElement("Scroll"),{
+		Parent = WindowMain,
+		--
+		Position = UDim2.fromScale(.25,.5),
+		Size = UDim2.fromScale(.75,1),
+		AnchorPoint = Vector2.new(0,.5),
+		--
+		ScrollBarThickness = 3,
+	}),{
+		MakeElement("List",-0.05)
+	})
+	
+	local Option = SetChildren(SetProperties(MakeElement("Frame"),{
+		Parent = script,
+		--
+		Position = UDim2.fromScale(0,0),
+		Size = UDim2.fromScale(1,.291),
+		AnchorPoint = Vector2.new(0,0),
+		--
+		BackgroundTransparency = 1,
+	}),{
+		SetChildren(SetProperties(MakeElement("Frame",nil,.3),{
+			Position = UDim2.fromScale(.5,.5),
+			Size = UDim2.fromScale(.9,.6),
+			AnchorPoint = Vector2.new(.5,.5),
+			--
+			Name = "Main",
+			BackgroundTransparency = 1,
+		}),{
+			MakeElement("Stroke",Color3.fromRGB(100,100,100)),
+			SetProperties(MakeElement("Text","Option"),{
+				Position = UDim2.fromScale(.023,.5),
+				Size = UDim2.fromScale(.8,.5),
+				AnchorPoint = Vector2.new(0,.5),
+				--
+				Name = "Title"
+			}),
+			SetChildren(SetProperties(MakeElement("Button",Color3.fromRGB(100,100,100),nil,0.3),{
+				Position = UDim2.fromScale(.93,.5),
+				Size = UDim2.fromScale(.096,.719),
+				AnchorPoint = Vector2.new(.5,.5),
+				--
+				Name = "Button"
+			}),{
+				MakeElement("Ratio",1),
+				SetProperties(MakeElement("Image","rbxassetid://12690727184"),{
+					Position = UDim2.fromScale(.5,.5),
+					Size = UDim2.fromScale(.6,.6),
+					AnchorPoint = Vector2.new(.5,.5),
+					--
+					Name = "Icon",
+					ImageTransparency = 1,
+				})
+			})
+		})
+	})
+	
+	--=================================================
+					--Constructor--
+	
+	local OnColor = Color3.fromRGB(80, 123, 223)
+	local OffColor = Color3.fromRGB(100,100,100)
+	
+	local CurrentTab = nil
+	--
+	local function ChangeCurrentOptions()
+		for _,Option in pairs(Options:GetChildren()) do
+			if not Option:IsA("Frame") then continue end
+			Option.Visible = false
+		end
+		--
+		if not CurrentTab then return end
+		for _,Option in pairs(CurrentTab.Options) do
+			Option.Option.Visible = true
+		end
+	end
+	local function ChangeCurrentTab(Tab)
+		--
+		if CurrentTab then
+			Services.Tween:Create(CurrentTab.Button.UIStroke,TweenInfo.new(.15),{Color=OffColor}):Play()
+		end
+		CurrentTab = Tab
+		Services.Tween:Create(CurrentTab.Button.UIStroke,TweenInfo.new(.15),{Color=OnColor}):Play()
+		ChangeCurrentOptions()
+	end
+	ChangeCurrentOptions()
+	
+	function Window:SetCurrentTab(Tab)
+		ChangeCurrentTab(Tab)
+	end
+	
+	function Window:AddTab(TabConfigs)
+		if not TabConfigs then warn("ERROR: YOU HAVE NOT ADDED A TAB CONFIGURATION!") return end
+		--
+		local NewTab:Frame = Tab:Clone()
+		NewTab.Parent = Tabs
+		--
+		local Button = NewTab:FindFirstChildOfClass("ImageButton")
+		local Title = Button:FindFirstChildOfClass("TextLabel")
+		--
+		local Tab = {}
+		Tab.Tab = NewTab
+		Tab.Button = Button
+		Tab.Title = Title
+		Tab.Options = {}
+		--
+		Title.Text = TabConfigs.Title or "Tab"
+		--
+		function Tab:AddOption(OptionConfigs)
+			if not OptionConfigs then warn("ERROR: YOU HAVE NOT ADDED A OPTION CONFIGURATION!") return end
+			--
+			local NewOption = Option:Clone()
+			NewOption.Parent = Options
+			--
+			local Main = NewOption.Main
+			local Title = Main.Title
+			--
+			local Button = Main.Button
+			local Check = Button.Icon
+			--
+			local Option = {}
+			Option.Option = NewOption
+			Option.Main = Main
+			Option.Button = Button
+			Option.Title = Title
+			
+			Option.Title.Text = OptionConfigs.Title or "Option"
+			
+			if CurrentTab~=Tab then Option.Option.Visible = false end
+			--
+			if OptionConfigs.Type == "CheckBox" then
+				local Active = false
+				--
+				AddConnection(Option.Button.MouseButton1Click, function()
+					Active = not Active
+					--
+					if Active then
+						OptionConfigs.On()
+						Services.Tween:Create(Option.Button,TweenInfo.new(.2),{BackgroundColor3=OnColor}):Play()
+						Services.Tween:Create(Check,TweenInfo.new(.2),{ImageTransparency=0}):Play()
+					else
+						OptionConfigs.Off()
+						Services.Tween:Create(Option.Button,TweenInfo.new(.2),{BackgroundColor3=OffColor}):Play()
+						Services.Tween:Create(Check,TweenInfo.new(.2),{ImageTransparency=1}):Play()
+					end
+				end)
+				--
+			elseif OptionConfigs.Type == "Click" then
+				--
+				Option.Button.Icon.Image = "rbxassetid://12333784627"
+				Option.Button.Icon.ImageTransparency = 0
+				Option.Button.Icon.Size = UDim2.fromScale(.9,.9)
+				--
+				AddConnection(Option.Button.MouseButton1Click, function()
+					OptionConfigs.Click()
+					Services.Tween:Create(Option.Button,TweenInfo.new(.05),{BackgroundColor3=OnColor}):Play()
+					wait(.05)
+					Services.Tween:Create(Option.Button,TweenInfo.new(.1),{BackgroundColor3=OffColor}):Play()
+				end)
+				--
+			end
+			--
+			table.insert(Tab.Options,Option)
+			return Option
+		end
+		--
+		AddConnection(Button.MouseButton1Click, function()
+			--
+			ChangeCurrentTab(Tab)
+		end)
+		--
+		return Tab
+	end
+	
+	
+	-- Return List
 	return Window
 end
 
