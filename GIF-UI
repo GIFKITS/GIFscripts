@@ -179,6 +179,26 @@ AddElement("Text",function(Text, TextXAl, Color)
 	return Object
 end)
 --
+AddElement("TextBox",function(Color, Placeholder, CornerSize)
+	local Object = CreateObject("TextBox",{
+		--
+		BackgroundColor3 = Color or Color3.fromRGB(255, 255, 255),
+		BorderSizePixel = 0,
+		--
+		PlaceholderColor3 = Color3.fromRGB(180, 180, 180),
+		TextColor3 = Color3.fromRGB(255, 255, 255),
+		Text = "",
+		Font = GifUI_lib.MainFont,
+		TextScaled = true,
+		PlaceholderText = Placeholder or "",
+	},{
+		CreateObject("UICorner",{
+			CornerRadius = UDim.new(CornerSize or 0, 0),
+		}),
+	})
+	return Object
+end)
+--
 AddElement("Image",function(ImageID, Transparency)
 	local Object:ImageLabel = CreateObject("ImageLabel",{
 		--
@@ -516,9 +536,9 @@ function GifUI_lib:MakeWindow(WindowConfig)
 			
 			if CurrentTab~=Tab then Option.Option.Visible = false end
 			--
-			if OptionConfigs.Type == "CheckBox" then
-				local Active = false
+			if OptionConfigs.Type == "Check" then
 				--
+				local Active = false
 				AddConnection(Option.Button.MouseButton1Click, function()
 					Active = not Active
 					--
@@ -546,10 +566,96 @@ function GifUI_lib:MakeWindow(WindowConfig)
 					Services.Tween:Create(Option.Button,TweenInfo.new(.1),{BackgroundColor3=OffColor}):Play()
 				end)
 				--
+			elseif OptionConfigs.Type == "InputCheck" then
+				--
+				local Active = false
+				Button.Position = UDim2.fromScale(.64,.5)
+				--
+				local TextBox = SetChildren(SetProperties(MakeElement("TextBox",Color3.fromRGB(100,100,100),OptionConfigs.PlaceHolder,.3),{
+					Parent = Option.Main,
+					Position = UDim2.fromScale(.841,.5),
+					Size = UDim2.fromScale(.273,.719),
+					AnchorPoint = Vector2.new(.5,.5),
+				}),{
+					AddElement("Ratio",2.831),
+				})
+				--
+				AddConnection(Option.Button.MouseButton1Click, function()
+					Active = not Active
+					--
+					if Active then
+						OptionConfigs.On(TextBox.Text)
+						Services.Tween:Create(Option.Button,TweenInfo.new(.2),{BackgroundColor3=OnColor}):Play()
+						Services.Tween:Create(Check,TweenInfo.new(.2),{ImageTransparency=0}):Play()
+					else
+						OptionConfigs.Off(TextBox.Text)
+						Services.Tween:Create(Option.Button,TweenInfo.new(.2),{BackgroundColor3=OffColor}):Play()
+						Services.Tween:Create(Check,TweenInfo.new(.2),{ImageTransparency=1}):Play()
+					end
+				end)
+			elseif OptionConfigs.Type == "InputClick" then
+				--
+				local Active = false
+				Button.Position = UDim2.fromScale(.64,.5)
+				Option.Button.Icon.Image = "rbxassetid://12333784627"
+				Option.Button.Icon.ImageTransparency = 0
+				Option.Button.Icon.Size = UDim2.fromScale(.9,.9)
+				--
+				local TextBox = SetChildren(SetProperties(MakeElement("TextBox",Color3.fromRGB(100,100,100),OptionConfigs.PlaceHolder,.3),{
+					Parent = Option.Main,
+					Position = UDim2.fromScale(.841,.5),
+					Size = UDim2.fromScale(.273,.719),
+					AnchorPoint = Vector2.new(.5,.5),
+				}),{
+					AddElement("Ratio",2.831),
+				})
+				--
+				AddConnection(Option.Button.MouseButton1Click, function()
+					OptionConfigs.Click(TextBox.Text)
+					Services.Tween:Create(Option.Button,TweenInfo.new(.05),{BackgroundColor3=OnColor}):Play()
+					wait(.05)
+					Services.Tween:Create(Option.Button,TweenInfo.new(.1),{BackgroundColor3=OffColor}):Play()
+				end)
+			elseif OptionConfigs.Type == "Input" then
+				--
+				Option.Button:Destroy()
+				--
+				local TextBox:TextBox = SetChildren(SetProperties(MakeElement("TextBox",Color3.fromRGB(100,100,100),OptionConfigs.PlaceHolder,.3),{
+					Parent = Option.Main,
+					Position = UDim2.fromScale(.841,.5),
+					Size = UDim2.fromScale(.273,.719),
+					AnchorPoint = Vector2.new(.5,.5),
+				}),{
+					AddElement("Ratio",2.831),
+				})
+				--
+				TextBox.Changed:Connect(function(Property)
+					if Property~="Text" then return end
+					OptionConfigs.Change(TextBox.Text)
+				end)
+			elseif OptionConfigs.Type == "Text" then
+				--
+				Option.Title.Parent = Option.Option
+				Option.Main:Destroy()
+				--
+				Option.Title.Position = UDim2.fromScale(.5,.5)
+				Option.Title.Size = UDim2.fromScale(.9,.5)
+				Option.Title.AnchorPoint = Vector2.new(.5,.5)
+				Option.Option.Size = UDim2.fromScale(1,.18)
+				--
+				Option.Title.TextXAlignment = OptionConfigs.TextX or Enum.TextXAlignment.Center
 			end
 			--
 			table.insert(Tab.Options,Option)
 			return Option
+		end
+		--
+		function Tab:MakeSpace()
+			local Space = Option:Clone()
+			Space.Parent = Options
+			Space.Main:Destroy()
+			Space.Size = UDim2.fromScale(1,.12)
+			return Space
 		end
 		--
 		AddConnection(Button.MouseButton1Click, function()
@@ -563,6 +669,10 @@ function GifUI_lib:MakeWindow(WindowConfig)
 	
 	-- Return List
 	return Window
+end
+
+if RealParent.Name=="CoreGui" then
+	warn("✔️ - GIF-UI Lib Successfully Loaded - ✔️")
 end
 
 return GifUI_lib
