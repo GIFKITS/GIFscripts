@@ -4,6 +4,7 @@ local Services = {
 	Players = game:GetService("Players"),
 	Input = game:GetService("UserInputService"),
 	Tween = game:GetService("TweenService"),
+	Run = game:GetService("RunService"),
 }
 
 local GifUI_lib = {
@@ -286,7 +287,7 @@ function GifUI_lib:MakeWindow(WindowConfig)
 		AnchorPoint = Vector2.new(.5,0),
 	})
 	
-	local MousePosition = nil
+	local StoredMouseLocation = nil
 	local FramePosition = nil
 	local Draggable = false
 	
@@ -294,7 +295,7 @@ function GifUI_lib:MakeWindow(WindowConfig)
 		if Input.UserInputType~=Enum.UserInputType.MouseButton1 and Input.UserInputType~=Enum.UserInputType.Touch then return end
 		--
 		Draggable = true
-		MousePosition = Vector2.new(Input.Position.X,Input.Position.Y)
+		StoredMouseLocation = Services.Input:GetMouseLocation()
 		FramePosition = Vector2.new(WindowHandler.Position.X.Scale,WindowHandler.Position.Y.Scale)
 	end)
 	
@@ -304,10 +305,11 @@ function GifUI_lib:MakeWindow(WindowConfig)
 		Draggable = false
 	end)
 	
-	AddConnection(Services.Input.InputChanged, function(Input)
-		if not Draggable or (Input.UserInputType~=Enum.UserInputType.MouseMovement and Input.UserInputType~=Enum.UserInputType.Touch) then return end
+	AddConnection(Services.Run.RenderStepped, function()
+		if not Draggable then return end
 		--
-		local NewPosition = FramePosition + ((Vector2.new(Input.Position.X,Input.Position.Y) - MousePosition) / workspace.CurrentCamera.ViewportSize)
+		local MouseLocation = Services.Input:GetMouseLocation()
+		local NewPosition = FramePosition + ((Vector2.new(MouseLocation.X,MouseLocation.Y) - StoredMouseLocation) / workspace.CurrentCamera.ViewportSize)
 		WindowHandler.Position = UDim2.fromScale(NewPosition.X, NewPosition.Y)
 	end)
 	
