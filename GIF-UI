@@ -683,6 +683,7 @@ end)
 --
 if RealParent.Name=="CoreGui" then
 	print("✔️ - GIF-UI Lib Successfully Loaded - ✔️")
+	print("Version 1.01")
 else
 	print("✔️ - GIF-UI Successfully Loaded In Roblox Studio - ✔️")
 end
