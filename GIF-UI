@@ -462,8 +462,7 @@ function GifUI_lib:MakeWindow(WindowConfig)
 	--=================================================
 					--Constructor--
 	
-	local ActivateColor = Color3.fromRGB(80, 180, 255)
-	
+	local ActivateColor = Color3.fromRGB(130, 200, 100)
 	local CurrentTab = nil
 	--
 	local function ChangeCurrentOptions()
@@ -482,7 +481,7 @@ function GifUI_lib:MakeWindow(WindowConfig)
 			Services.Tween:Create(CurrentTab.Tab,TweenInfo.new(.2,Enum.EasingStyle.Exponential),{Size=UDim2.fromScale(1,.225)}):Play()
 		end
 		CurrentTab = Tab
-		Services.Tween:Create(CurrentTab.Tab,TweenInfo.new(.2,Enum.EasingStyle.Exponential),{Size=UDim2.fromScale(1.3,.285)}):Play()
+		Services.Tween:Create(CurrentTab.Tab,TweenInfo.new(.2,Enum.EasingStyle.Exponential),{Size=UDim2.fromScale(1.4,.285)}):Play()
 		ChangeCurrentOptions()
 	end
 	--
@@ -558,9 +557,9 @@ function GifUI_lib:MakeWindow(WindowConfig)
 				--
 				AddConnection(Option.Button.MouseButton1Click, function()
 					OptionConfigs.Click()
-					Services.Tween:Create(Option.Button,TweenInfo.new(.05),{BackgroundColor3=ActivateColor}):Play()
-					wait(.05)
-					Services.Tween:Create(Option.Button,TweenInfo.new(.1),{BackgroundColor3=ColorStore}):Play()
+					Services.Tween:Create(Option.Button,TweenInfo.new(.1),{BackgroundColor3=ActivateColor}):Play()
+					wait(.2)
+					Services.Tween:Create(Option.Button,TweenInfo.new(.2),{BackgroundColor3=ColorStore}):Play()
 				end)
 				--
 			elseif OptionConfigs.Type == "InputCheck" then
@@ -611,9 +610,9 @@ function GifUI_lib:MakeWindow(WindowConfig)
 				--
 				AddConnection(Option.Button.MouseButton1Click, function()
 					OptionConfigs.Click(TextBox.Text)
-					Services.Tween:Create(Option.Button,TweenInfo.new(.05),{BackgroundColor3=ActivateColor}):Play()
-					wait(.05)
-					Services.Tween:Create(Option.Button,TweenInfo.new(.1),{BackgroundColor3=ColorStore}):Play()
+					Services.Tween:Create(Option.Button,TweenInfo.new(.1),{BackgroundColor3=ActivateColor}):Play()
+					wait(.2)
+					Services.Tween:Create(Option.Button,TweenInfo.new(.2),{BackgroundColor3=ColorStore}):Play()
 				end)
 			elseif OptionConfigs.Type == "Input" then
 				--
