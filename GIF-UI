@@ -101,6 +101,17 @@ function SetChildren(Object, Children)
 	return Object
 end
 
+function AddClickSound(Button)
+	--
+	local Sound = Instance.new("Sound",Button)
+	Sound.SoundId = "rbxassetid://17208396156"
+	--
+	AddConnection(Button.MouseButton1Click,function()
+		--
+		Sound:Play()
+	end)
+end
+
 --===============================================
 
 -- Elements
@@ -210,16 +221,6 @@ AddElement("Image",function(ImageID, Transparency)
 	return Object
 end)
 --
-AddElement("Stroke",function(Color)
-	local Object = CreateObject("UIStroke",{
-		--
-		Color = Color or Color3.fromRGB(255, 255, 255),
-		Thickness = 1,
-		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-	})
-	return Object
-end)
---
 AddElement("Ratio",function(Aspect)
 	local Object = CreateObject("UIAspectRatioConstraint",{
 		--
@@ -235,6 +236,7 @@ AddElement("List",function(Padding)
 		--
 		Padding = UDim.new(Padding or 0, 0),
 		SortOrder = Enum.SortOrder.LayoutOrder,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
 	})
 	return Object
 end)
@@ -276,14 +278,12 @@ function GifUI_lib:MakeWindow(WindowConfig)
 	
 	-- Top Bar
 	
-	local WindowTopBar:Frame = SetChildren(SetProperties(MakeElement("Frame",Color3.fromRGB(25,25,25)),{
+	local WindowTopBar:Frame = SetProperties(MakeElement("Frame",Color3.fromRGB(20,20,20)),{
 		Parent = WindowHandler,
 		--
 		Position = UDim2.fromScale(.5,0),
 		Size = UDim2.fromScale(1,.12),
 		AnchorPoint = Vector2.new(.5,0),
-	}),{
-		MakeElement("Stroke",Color3.fromRGB(50,50,50))
 	})
 	
 	local MousePosition = nil
@@ -334,8 +334,6 @@ function GifUI_lib:MakeWindow(WindowConfig)
 	})
 	
 	AddConnection(DestroyButton.MouseButton1Click, function()
-		Title.Text = "Disconnecting..."
-		task.wait(.05)
 		GifUI.Parent = nil -- Break All Functions 😎
 	end)
 	
@@ -374,8 +372,10 @@ function GifUI_lib:MakeWindow(WindowConfig)
 		Position = UDim2.fromScale(0,.5),
 		Size = UDim2.fromScale(.25,1),
 		AnchorPoint = Vector2.new(0,.5),
+		--
+		BackgroundColor3 = Color3.fromRGB(20,20,20),
+		BackgroundTransparency = 0,
 	}),{
-		MakeElement("Stroke",Color3.fromRGB(50,50,50)),
 		MakeElement("List",-0.03)
 	})
 	
@@ -388,13 +388,11 @@ function GifUI_lib:MakeWindow(WindowConfig)
 		--
 		BackgroundTransparency = 1,
 	}),{
-		SetChildren(SetProperties(MakeElement("Button",nil,1,.3),{
+		SetChildren(SetProperties(MakeElement("Button",Color3.fromRGB(30,30,30),0,.3),{
 			Position = UDim2.fromScale(.5,.5),
 			Size = UDim2.fromScale(.831,.568),
 			AnchorPoint = Vector2.new(.5,.5),
 		}),{
-			MakeElement("Stroke",Color3.fromRGB(100,100,100)),
-			--
 			SetProperties(MakeElement("Text","Tab",Enum.TextXAlignment.Center),{
 				Position = UDim2.fromScale(.5,.5),
 				Size = UDim2.fromScale(.5,.5),
@@ -427,15 +425,13 @@ function GifUI_lib:MakeWindow(WindowConfig)
 		--
 		BackgroundTransparency = 1,
 	}),{
-		SetChildren(SetProperties(MakeElement("Frame",nil,.3),{
+		SetChildren(SetProperties(MakeElement("Frame",Color3.fromRGB(20,20,20),.3),{
 			Position = UDim2.fromScale(.5,.5),
 			Size = UDim2.fromScale(.9,.6),
 			AnchorPoint = Vector2.new(.5,.5),
 			--
 			Name = "Main",
-			BackgroundTransparency = 1,
 		}),{
-			MakeElement("Stroke",Color3.fromRGB(100,100,100)),
 			SetProperties(MakeElement("Text","Option"),{
 				Position = UDim2.fromScale(.023,.5),
 				Size = UDim2.fromScale(.8,.5),
@@ -443,7 +439,7 @@ function GifUI_lib:MakeWindow(WindowConfig)
 				--
 				Name = "Title"
 			}),
-			SetChildren(SetProperties(MakeElement("Button",Color3.fromRGB(100,100,100),nil,0.3),{
+			SetChildren(SetProperties(MakeElement("Button",Color3.fromRGB(30,30,30),nil,0.3),{
 				Position = UDim2.fromScale(.93,.5),
 				Size = UDim2.fromScale(.096,.719),
 				AnchorPoint = Vector2.new(.5,.5),
@@ -466,8 +462,7 @@ function GifUI_lib:MakeWindow(WindowConfig)
 	--=================================================
 					--Constructor--
 	
-	local OnColor = Color3.fromRGB(80, 123, 223)
-	local OffColor = Color3.fromRGB(100,100,100)
+	local ActivateColor = Color3.fromRGB(80, 180, 255)
 	
 	local CurrentTab = nil
 	--
@@ -483,16 +478,16 @@ function GifUI_lib:MakeWindow(WindowConfig)
 		end
 	end
 	local function ChangeCurrentTab(Tab)
-		--
 		if CurrentTab then
-			Services.Tween:Create(CurrentTab.Button.UIStroke,TweenInfo.new(.15),{Color=OffColor}):Play()
+			Services.Tween:Create(CurrentTab.Tab,TweenInfo.new(.2,Enum.EasingStyle.Exponential),{Size=UDim2.fromScale(1,.225)}):Play()
 		end
 		CurrentTab = Tab
-		Services.Tween:Create(CurrentTab.Button.UIStroke,TweenInfo.new(.15),{Color=OnColor}):Play()
+		Services.Tween:Create(CurrentTab.Tab,TweenInfo.new(.2,Enum.EasingStyle.Exponential),{Size=UDim2.fromScale(1.3,.285)}):Play()
 		ChangeCurrentOptions()
 	end
-	ChangeCurrentOptions()
+	--
 	
+	ChangeCurrentOptions()
 	function Window:SetCurrentTab(Tab)
 		ChangeCurrentTab(Tab)
 	end
@@ -538,40 +533,43 @@ function GifUI_lib:MakeWindow(WindowConfig)
 			--
 			if OptionConfigs.Type == "Check" then
 				--
+				local ColorStore = Option.Button.BackgroundColor3
 				local Active = false
 				AddConnection(Option.Button.MouseButton1Click, function()
 					Active = not Active
 					--
 					if Active then
 						OptionConfigs.On()
-						Services.Tween:Create(Option.Button,TweenInfo.new(.2),{BackgroundColor3=OnColor}):Play()
+						Services.Tween:Create(Option.Button,TweenInfo.new(.2),{BackgroundColor3=ActivateColor}):Play()
 						Services.Tween:Create(Check,TweenInfo.new(.2),{ImageTransparency=0}):Play()
 					else
 						OptionConfigs.Off()
-						Services.Tween:Create(Option.Button,TweenInfo.new(.2),{BackgroundColor3=OffColor}):Play()
+						Services.Tween:Create(Option.Button,TweenInfo.new(.2),{BackgroundColor3=ColorStore}):Play()
 						Services.Tween:Create(Check,TweenInfo.new(.2),{ImageTransparency=1}):Play()
 					end
 				end)
 				--
 			elseif OptionConfigs.Type == "Click" then
 				--
+				local ColorStore = Option.Button.BackgroundColor3
 				Option.Button.Icon.Image = "rbxassetid://12333784627"
 				Option.Button.Icon.ImageTransparency = 0
 				Option.Button.Icon.Size = UDim2.fromScale(.9,.9)
 				--
 				AddConnection(Option.Button.MouseButton1Click, function()
 					OptionConfigs.Click()
-					Services.Tween:Create(Option.Button,TweenInfo.new(.05),{BackgroundColor3=OnColor}):Play()
+					Services.Tween:Create(Option.Button,TweenInfo.new(.05),{BackgroundColor3=ActivateColor}):Play()
 					wait(.05)
-					Services.Tween:Create(Option.Button,TweenInfo.new(.1),{BackgroundColor3=OffColor}):Play()
+					Services.Tween:Create(Option.Button,TweenInfo.new(.1),{BackgroundColor3=ColorStore}):Play()
 				end)
 				--
 			elseif OptionConfigs.Type == "InputCheck" then
 				--
+				local ColorStore = Option.Button.BackgroundColor3
 				local Active = false
 				Button.Position = UDim2.fromScale(.64,.5)
 				--
-				local TextBox = SetChildren(SetProperties(MakeElement("TextBox",Color3.fromRGB(100,100,100),OptionConfigs.PlaceHolder,.3),{
+				local TextBox = SetChildren(SetProperties(MakeElement("TextBox",Color3.fromRGB(30,30,30),OptionConfigs.PlaceHolder,.3),{
 					Parent = Option.Main,
 					Position = UDim2.fromScale(.841,.5),
 					Size = UDim2.fromScale(.273,.719),
@@ -585,23 +583,24 @@ function GifUI_lib:MakeWindow(WindowConfig)
 					--
 					if Active then
 						OptionConfigs.On(TextBox.Text)
-						Services.Tween:Create(Option.Button,TweenInfo.new(.2),{BackgroundColor3=OnColor}):Play()
+						Services.Tween:Create(Option.Button,TweenInfo.new(.2),{BackgroundColor3=ActivateColor}):Play()
 						Services.Tween:Create(Check,TweenInfo.new(.2),{ImageTransparency=0}):Play()
 					else
 						OptionConfigs.Off(TextBox.Text)
-						Services.Tween:Create(Option.Button,TweenInfo.new(.2),{BackgroundColor3=OffColor}):Play()
+						Services.Tween:Create(Option.Button,TweenInfo.new(.2),{BackgroundColor3=ColorStore}):Play()
 						Services.Tween:Create(Check,TweenInfo.new(.2),{ImageTransparency=1}):Play()
 					end
 				end)
 			elseif OptionConfigs.Type == "InputClick" then
 				--
+				local ColorStore = Option.Button.BackgroundColor3
 				local Active = false
 				Button.Position = UDim2.fromScale(.64,.5)
 				Option.Button.Icon.Image = "rbxassetid://12333784627"
 				Option.Button.Icon.ImageTransparency = 0
 				Option.Button.Icon.Size = UDim2.fromScale(.9,.9)
 				--
-				local TextBox = SetChildren(SetProperties(MakeElement("TextBox",Color3.fromRGB(100,100,100),OptionConfigs.PlaceHolder,.3),{
+				local TextBox = SetChildren(SetProperties(MakeElement("TextBox",Color3.fromRGB(30,30,30),OptionConfigs.PlaceHolder,.3),{
 					Parent = Option.Main,
 					Position = UDim2.fromScale(.841,.5),
 					Size = UDim2.fromScale(.273,.719),
@@ -612,15 +611,15 @@ function GifUI_lib:MakeWindow(WindowConfig)
 				--
 				AddConnection(Option.Button.MouseButton1Click, function()
 					OptionConfigs.Click(TextBox.Text)
-					Services.Tween:Create(Option.Button,TweenInfo.new(.05),{BackgroundColor3=OnColor}):Play()
+					Services.Tween:Create(Option.Button,TweenInfo.new(.05),{BackgroundColor3=ActivateColor}):Play()
 					wait(.05)
-					Services.Tween:Create(Option.Button,TweenInfo.new(.1),{BackgroundColor3=OffColor}):Play()
+					Services.Tween:Create(Option.Button,TweenInfo.new(.1),{BackgroundColor3=ColorStore}):Play()
 				end)
 			elseif OptionConfigs.Type == "Input" then
 				--
 				Option.Button:Destroy()
 				--
-				local TextBox:TextBox = SetChildren(SetProperties(MakeElement("TextBox",Color3.fromRGB(100,100,100),OptionConfigs.PlaceHolder,.3),{
+				local TextBox:TextBox = SetChildren(SetProperties(MakeElement("TextBox",Color3.fromRGB(30,30,30),OptionConfigs.PlaceHolder,.3),{
 					Parent = Option.Main,
 					Position = UDim2.fromScale(.841,.5),
 					Size = UDim2.fromScale(.273,.719),
@@ -671,8 +670,20 @@ function GifUI_lib:MakeWindow(WindowConfig)
 	return Window
 end
 
+for _,Descendant in pairs(GifUI:GetDescendants()) do
+	if not Descendant:IsA("TextButton") or not Descendant:IsA("ImageButton") then continue end
+	AddClickSound(Descendant)
+end
+AddConnection(GifUI.DescendantAdded,function(Descendant)
+	if not Descendant:IsA("TextButton") and not Descendant:IsA("ImageButton") then return end
+	AddClickSound(Descendant)
+end)
+
+--
 if RealParent.Name=="CoreGui" then
-	warn("✔️ - GIF-UI Lib Successfully Loaded - ✔️")
+	print("✔️ - GIF-UI Lib Successfully Loaded - ✔️")
+else
+	print("✔️ - GIF-UI Successfully Loaded In Roblox Studio - ✔️")
 end
 
 return GifUI_lib
