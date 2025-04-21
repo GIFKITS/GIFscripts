@@ -377,6 +377,7 @@ function GifUI_lib:MakeWindow(WindowConfig)
 		--
 		BackgroundColor3 = Color3.fromRGB(20,20,20),
 		BackgroundTransparency = 0,
+		ScrollBarImageTransparency = 1,
 	}),{
 		MakeElement("List",-0.03)
 	})
@@ -413,7 +414,7 @@ function GifUI_lib:MakeWindow(WindowConfig)
 		Size = UDim2.fromScale(.75,1),
 		AnchorPoint = Vector2.new(0,.5),
 		--
-		ScrollBarThickness = 3,
+		ScrollBarImageTransparency = 1,
 	}),{
 		MakeElement("List",-0.05)
 	})
