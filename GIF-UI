@@ -656,6 +656,7 @@ function GifUI_lib:MakeWindow(WindowConfig)
 			Space.Parent = Options
 			Space.Main:Destroy()
 			Space.Size = UDim2.fromScale(1,.12)
+			table.insert(Tab.Options,{Option=Space})
 			return Space
 		end
 		--
