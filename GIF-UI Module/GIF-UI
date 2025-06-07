@@ -1,5 +1,4 @@
 if not game:IsLoaded() then game.Loaded:Wait() end
---local GIFui = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/GIFscripts/refs/heads/main/GIF-UI%20Module/GIF-UI.lua"))
 
 local Services = {
 	Players = game:GetService("Players"),
