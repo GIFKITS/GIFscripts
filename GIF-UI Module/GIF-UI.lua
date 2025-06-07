@@ -1,4 +1,5 @@
 if not game:IsLoaded() then game.Loaded:Wait() end
+--local GIFui = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/GIFscripts/refs/heads/main/GIF-UI%20Module/GIF-UI.lua"))
 
 local Services = {
 	Players = game:GetService("Players"),
@@ -571,7 +572,7 @@ function GifUI_lib:MakeWindow(WindowConfig)
 				local Active = false
 				Button.Position = UDim2.fromScale(.64,.5)
 				--
-				local TextBox = SetChildren(SetProperties(MakeElement("TextBox",Color3.fromRGB(30,30,30),OptionConfigs.PlaceHolder,.3),{
+				local TextBox:TextBox = SetChildren(SetProperties(MakeElement("TextBox",Color3.fromRGB(30,30,30),OptionConfigs.PlaceHolder,.3),{
 					Parent = Option.Main,
 					Position = UDim2.fromScale(.841,.5),
 					Size = UDim2.fromScale(.273,.719),
@@ -592,6 +593,11 @@ function GifUI_lib:MakeWindow(WindowConfig)
 						Services.Tween:Create(Option.Button,TweenInfo.new(.2),{BackgroundColor3=ColorStore}):Play()
 						Services.Tween:Create(Check,TweenInfo.new(.2),{ImageTransparency=1}):Play()
 					end
+				end)
+				--
+				AddConnection(TextBox.Changed, function(Property)
+					if Property~="Text" then return end
+					OptionConfigs.Changed(TextBox.Text)
 				end)
 			elseif OptionConfigs.Type == "InputClick" then
 				--
@@ -617,6 +623,10 @@ function GifUI_lib:MakeWindow(WindowConfig)
 					wait(.2)
 					Services.Tween:Create(Option.Button,TweenInfo.new(.2),{BackgroundColor3=ColorStore}):Play()
 				end)
+				AddConnection(TextBox.Changed, function(Property)
+					if Property~="Text" then return end
+					OptionConfigs.Changed(TextBox.Text)
+				end)
 			elseif OptionConfigs.Type == "Input" then
 				--
 				Option.Button:Destroy()
@@ -632,7 +642,7 @@ function GifUI_lib:MakeWindow(WindowConfig)
 				--
 				TextBox.Changed:Connect(function(Property)
 					if Property~="Text" then return end
-					OptionConfigs.Change(TextBox.Text)
+					OptionConfigs.Changed(TextBox.Text)
 				end)
 			elseif OptionConfigs.Type == "Text" then
 				--
