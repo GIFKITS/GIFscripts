@@ -5,7 +5,7 @@ local Services = {
 	Players = game:GetService("Players"),
 	Run = game:GetService("RunService"),
 }
-local GIFui = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/GIFscripts/refs/heads/main/GIF-UI%20Module/GIF-UI"))()
+local GIFui = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/GIFscripts/refs/heads/main/GIF-UI%20Module/GIF-UI.lua"))()
 local Window = GIFui:MakeWindow({Title="GIF-UI | Murderers VS Sheriffs DUELS"})
 
 local MainTab = Window:AddTab({Title="Main"})
