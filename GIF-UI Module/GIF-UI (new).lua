@@ -3,7 +3,7 @@ GIFui Made By GIFKITS
 thank you for using this gui library!
 ]]--
 
-ver = .2
+ver = .3
 
 local GIFui = {
 	Connections = {},
@@ -11,7 +11,7 @@ local GIFui = {
 	--
 	Gui = {},
 	Templates = {},
-	
+
 	OpenKey = Enum.KeyCode.RightControl,
 }
 local Services = {
@@ -209,7 +209,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 		--
 		CurrentTab = nil,
 	}
-	
+
 	--
 	local WindowHandler = SetChildren(SetProperties(Template("Canvas",nil,1,.05),{
 		Name = "Window",
@@ -235,7 +235,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 	}),{
 		Template("Gradient",Color3.fromRGB(209,209,209),Color3.fromRGB(89,89,89)),
 	})
-	
+
 	local WindowTop = SetChildren(SetProperties(Template("Canvas",Color3.fromRGB(23,23,23)),{
 		Parent = WindowHandler,
 		Size = UDim2.fromScale(1,.1),
@@ -259,7 +259,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 			FillDirection = Enum.FillDirection.Horizontal,
 		}),
 	})
-	
+
 	local HideButton = SetChildren(SetProperties(Template("Button",Color3.fromRGB(60,60,60),nil,.4),{
 		Parent = TopButtonsHandler,
 		Size = UDim2.fromScale(.32,.582),
@@ -288,7 +288,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 			AnchorPoint = Vector2.new(.5,.5),
 		}),
 	})
-	
+
 	--
 	local TabsHandler = SetChildren(SetProperties(Template("Scroll",Color3.new(0,0,0),.7),{
 		Parent = WindowMain,
@@ -308,7 +308,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 	})
 	--
 	local AssetsFolder = Create("Folder",{Name="Assets",Parent=WindowHandler})
-	
+
 	local Tab = SetChildren(SetProperties(Template("Frame",nil,1),{
 		Parent = AssetsFolder,
 		Name = "Tab",
@@ -384,7 +384,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 			})
 		})
 	})
-	
+
 	local ClickOption = SetChildren(SetProperties(Template("Frame",nil,1),{
 		Parent = AssetsFolder,
 		Name = "ClickOption",
@@ -436,7 +436,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 			})
 		})
 	})
-	
+
 	local InputOption = SetChildren(SetProperties(Template("Frame",nil,1),{
 		Parent = AssetsFolder,
 		Name = "InputOption",
@@ -482,7 +482,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 			})
 		})
 	})
-	
+
 	--MAIN--
 	function Window:Destroy()
 		for _,RbxConnection in next, self.Connections or {} do
@@ -509,7 +509,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 	function Window:Open()
 		WindowHandler.Visible = true
 	end
-	
+
 	local IsHide = false
 	local OpenTrigger = nil
 	Window:AddConnection(HideButton.MouseButton1Click, function()
@@ -521,18 +521,13 @@ function GIFui.MakeWindow(WindowTitle:string)
 		end
 	end)
 	Window:AddConnection(CloseButton.MouseButton1Click, function()
-		Window:Close()
-		OpenTrigger = Window:AddConnection(Services.Input.InputBegan, function(Input, Event)
-			if Event or Input.KeyCode~=GIFui.OpenKey then return end
-			Window:Open()
-			OpenTrigger:Disconnect()
-		end)
+		Window:Destroy()
 	end)
 	--dragg window
 	local StoredMouseLocation = nil
 	local FramePosition = nil
 	local Draggable = false
-	
+
 	Window:AddConnection(WindowTop.InputBegan, function(Input)
 		if Input.UserInputType~=Enum.UserInputType.MouseButton1 and Input.UserInputType~=Enum.UserInputType.Touch then return end
 		--
@@ -540,13 +535,13 @@ function GIFui.MakeWindow(WindowTitle:string)
 		StoredMouseLocation = Services.Input:GetMouseLocation()
 		FramePosition = Vector2.new(WindowHandler.Position.X.Scale,WindowHandler.Position.Y.Scale)
 	end)
-	
+
 	Window:AddConnection(WindowTop.InputEnded, function(Input)
 		if Input.UserInputType~=Enum.UserInputType.MouseButton1 and Input.UserInputType~=Enum.UserInputType.Touch then return end
 		--
 		Draggable = false
 	end)
-	
+
 	Window:AddConnection(Services.Run.Heartbeat, function()
 		if not Draggable then return end
 		--
@@ -554,9 +549,9 @@ function GIFui.MakeWindow(WindowTitle:string)
 		local NewPosition = FramePosition + ((Vector2.new(MouseLocation.X,MouseLocation.Y) - StoredMouseLocation) / workspace.CurrentCamera.ViewportSize)
 		WindowHandler.Position = UDim2.fromScale(NewPosition.X, NewPosition.Y)
 	end)
-	
+
 	--Tabs And Options--
-	
+
 	function Window:MakeTab(TabTitle)
 		local TabMain = Tab:Clone()
 		TabMain.Visible = true
@@ -564,7 +559,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 		local Button = TabMain.Button
 		local Title = Button.Title
 		Title.Text = tostring(TabTitle)
-		
+
 		local NewTab = {
 			Build = {
 				Base = TabMain,
@@ -573,7 +568,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 			},
 			Elements = {},
 		}
-		
+
 		local function Activate()
 			for _,OtherElement in pairs(OptionsHandler:GetChildren()) do
 				if not OtherElement:IsA("GuiBase") then continue end
@@ -585,7 +580,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 				MyElement.Build.Base.Visible = true
 			end
 		end
-		
+
 		Window:AddConnection(Button.MouseButton1Click, function()
 			self.CurrentTab = NewTab
 		end)
@@ -599,9 +594,9 @@ function GIFui.MakeWindow(WindowTitle:string)
 			Services.Tween:Create(NewTab.Build.Base,TweenInfo.new(TweenTime/2),{Size=UDim2.fromScale(.9,.15)}):Play()
 			Services.Tween:Create(NewTab.Build.Title,TweenInfo.new(TweenTime/2),{TextColor3=Color3.new(1,1,1)}):Play()
 		end)
-		
+
 		--Options
-		
+
 		local function GetOption(Type)
 			local Options = {
 				["Check"] = CheckOption,
@@ -636,19 +631,19 @@ function GIFui.MakeWindow(WindowTitle:string)
 				Tip.Visible = false
 			end
 			table.insert(self.Elements,NewOption)
-			
+
 			local Block = SetProperties(Template("Frame",Color3.new(0,0,0),1),{
 				Parent = NewOption.Build.Handler,
 				Size = UDim2.fromScale(1,1),
 				Position = UDim2.fromScale(.5,.5),
 				AnchorPoint = Vector2.new(.5,.5),
 			})
-			
+
 			--Types--
-			
+
 			if OptionConfigs.Type=="Check" then
 				NewOption.Avtive = false
-				
+
 				local function Activate()
 					if NewOption.Avtive then
 						if OptionConfigs.CallBack.On then
@@ -664,12 +659,12 @@ function GIFui.MakeWindow(WindowTitle:string)
 						Services.Tween:Create(Title,TweenInfo.new(TweenTime),{TextColor3=Color3.new(1, 1, 1)}):Play()
 					end
 				end
-				
+
 				Window:AddConnection(Button.MouseButton1Click, function()
 					NewOption.Avtive = not NewOption.Avtive
 					Activate()
 				end)
-				
+
 				function NewOption:Activate()
 					if NewOption.Avtive then return end
 					NewOption.Avtive = true
@@ -714,7 +709,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 					Services.Tween:Create(Title,TweenInfo.new(TweenTime),{TextColor3=Color3.new(1, 1, 1)}):Play()
 					Services.Tween:Create(Button,TweenInfo.new(TweenTime),{PlaceholderColor3=Color3.fromRGB(65, 65, 65)}):Play()
 				end
-				
+
 				Window:AddConnection(Button.Changed, function(Property)
 					if Property~="Text" then return end
 					Activate()
@@ -729,7 +724,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 			end
 
 			--Block--
-			
+
 			function NewOption:Block()
 				Button.Interactable = false
 				Services.Tween:Create(Block,TweenInfo.new(TweenTime),{BackgroundTransparency=.4}):Play()
@@ -738,12 +733,12 @@ function GIFui.MakeWindow(WindowTitle:string)
 				Button.Interactable = true
 				Services.Tween:Create(Block,TweenInfo.new(TweenTime),{BackgroundTransparency=1}):Play()
 			end
-			
+
 			--
 
 			return NewOption
 		end
-		
+
 		function NewTab:AddTitle(Text, PosX, Color)
 			local NewTitle = {
 				Build = {
@@ -763,7 +758,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 			table.insert(self.Elements, NewTitle)
 			return NewTitle
 		end
-		
+
 		function NewTab:AddSpace()
 			local NewSpace = {
 				Build = {
@@ -780,12 +775,12 @@ function GIFui.MakeWindow(WindowTitle:string)
 			table.insert(self.Elements, NewSpace)
 			return NewSpace
 		end
-		
+
 		return NewTab
 	end
-	
+
 	----
-	
+
 	return Window
 end
 
