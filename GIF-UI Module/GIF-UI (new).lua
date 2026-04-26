@@ -71,7 +71,7 @@ end
 
 AddTemplate("Canvas", function(Color, Transparency, CornerSize)
 	local Object = Create("CanvasGroup",{
-		Transparency = Transparency or 0,
+		BackgroundTransparency = Transparency or 0,
 		BorderSizePixel = 0,
 		BackgroundColor3 = Color or Color3.fromRGB(24, 24, 27),
 	},{
@@ -83,7 +83,7 @@ AddTemplate("Canvas", function(Color, Transparency, CornerSize)
 end)
 AddTemplate("Frame", function(Color, Transparency, CornerSize)
 	local Object = Create("Frame",{
-		Transparency = Transparency or 0,
+		BackgroundTransparency = Transparency or 0,
 		BorderSizePixel = 0,
 		BackgroundColor3 = Color or Color3.fromRGB(24, 24, 27),
 	},{
@@ -113,7 +113,7 @@ end)
 
 AddTemplate("Button", function(Color, Transparency, CornerSize)
 	local Object = Create("TextButton",{
-		Transparency = Transparency or 0,
+		BackgroundTransparency = Transparency or 0,
 		BorderSizePixel = 0,
 		BackgroundColor3 = Color or Color3.fromRGB(63, 63, 70),
 		TextColor3 = Color3.fromRGB(250, 250, 250),
@@ -130,7 +130,7 @@ AddTemplate("Button", function(Color, Transparency, CornerSize)
 end)
 AddTemplate("Scroll", function(Color, Transparency)
 	local Object = Create("ScrollingFrame",{
-		Transparency = Transparency or 1,
+		BackgroundTransparency = Transparency or 1,
 		BorderSizePixel = 0,
 		BackgroundColor3 = Color or Color3.new(0,0,0),
 		ScrollBarImageTransparency = 1,
@@ -223,7 +223,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 	}
 
 	--
-	local WindowHandler = SetChildren(SetProperties(Template("Canvas",Color3.fromRGB(24, 24, 27),0),{
+	local WindowHandler = SetChildren(SetProperties(Template("Canvas",Color3.fromRGB(24, 24, 27),1),{
 		Name = "Window",
 		Parent = GIFui_interface,
 		Size = UDim2.fromScale(.545,.5),
@@ -233,7 +233,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 		Template("Ratio",1.505),
 	})
 	--
-	local WindowMain = SetProperties(Template("Frame",Color3.fromRGB(24, 24, 27),1,0),{
+	local WindowMain = SetProperties(Template("Frame",Color3.fromRGB(24, 24, 27),0,0),{
 		Parent = WindowHandler,
 		Size = UDim2.fromScale(1,.9),
 		Position = UDim2.fromScale(.5,.1),
