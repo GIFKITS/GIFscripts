@@ -3,11 +3,11 @@ GIFui Made By GIFKITS
 thank you for using this gui library!
 ]]--
 
-ver = .3
+ver = .4
 
 local GIFui = {
 	Connections = {},
-	MainFont = Enum.Font.Cartoon,
+	MainFont = Enum.Font.GothamMedium,
 	--
 	Gui = {},
 	Templates = {},
@@ -73,10 +73,10 @@ AddTemplate("Canvas", function(Color, Transparency, CornerSize)
 	local Object = Create("CanvasGroup",{
 		Transparency = Transparency or 0,
 		BorderSizePixel = 0,
-		BackgroundColor3 = Color or Color3.new(1,1,1),
+		BackgroundColor3 = Color or Color3.fromRGB(24, 24, 27),
 	},{
 		Create("UICorner",{
-			CornerRadius = UDim.new(CornerSize or 0,0),
+			CornerRadius = UDim.new(CornerSize or 0, 6),
 		})
 	})
 	return Object
@@ -85,10 +85,10 @@ AddTemplate("Frame", function(Color, Transparency, CornerSize)
 	local Object = Create("Frame",{
 		Transparency = Transparency or 0,
 		BorderSizePixel = 0,
-		BackgroundColor3 = Color or Color3.new(1,1,1),
+		BackgroundColor3 = Color or Color3.fromRGB(24, 24, 27),
 	},{
 		Create("UICorner",{
-			CornerRadius = UDim.new(CornerSize or 0,0),
+			CornerRadius = UDim.new(CornerSize or 0, 6),
 		})
 	})
 	return Object
@@ -96,16 +96,16 @@ end)
 AddTemplate("Input", function(Color, Placeholder, CornerSize)
 	local Object = Create("TextBox",{
 		PlaceholderText = tostring(Placeholder or ""),
-		TextColor3 = Color3.new(1,1,1),
-		PlaceholderColor3 = Color3.fromRGB(65,65,65),
+		TextColor3 = Color3.fromRGB(250, 250, 250),
+		PlaceholderColor3 = Color3.fromRGB(161, 161, 170),
 		TextScaled = true,
 		Text = "",
 		Font = GIFui.MainFont,
 		BorderSizePixel = 0,
-		BackgroundColor3 = Color or Color3.new(1,1,1),
+		BackgroundColor3 = Color or Color3.fromRGB(39, 39, 42),
 	},{
 		Create("UICorner",{
-			CornerRadius = UDim.new(CornerSize or 0,0),
+			CornerRadius = UDim.new(CornerSize or 0, 6),
 		})
 	})
 	return Object
@@ -115,12 +115,15 @@ AddTemplate("Button", function(Color, Transparency, CornerSize)
 	local Object = Create("TextButton",{
 		Transparency = Transparency or 0,
 		BorderSizePixel = 0,
-		BackgroundColor3 = Color or Color3.new(1,1,1),
+		BackgroundColor3 = Color or Color3.fromRGB(63, 63, 70),
+		TextColor3 = Color3.fromRGB(250, 250, 250),
+		Font = GIFui.MainFont,
+		TextScaled = true,
 		Text = "",
-		AutoButtonColor = false,
+		AutoButtonColor = true,
 	},{
 		Create("UICorner",{
-			CornerRadius = UDim.new(CornerSize or 0,0),
+			CornerRadius = UDim.new(CornerSize or 0, 6),
 		})
 	})
 	return Object
@@ -139,7 +142,7 @@ end)
 AddTemplate("Text", function(Text, Xpos, Color)
 	local Object = Create("TextLabel",{
 		Text = tostring(Text or ""),
-		TextColor3 = Color or Color3.new(1,1,1),
+		TextColor3 = Color or Color3.fromRGB(250, 250, 250),
 		TextScaled = true,
 		BackgroundTransparency = 1,
 		Font = GIFui.MainFont,
@@ -211,7 +214,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 	}
 
 	--
-	local WindowHandler = SetChildren(SetProperties(Template("Canvas",nil,1,.05),{
+	local WindowHandler = SetChildren(SetProperties(Template("Canvas",nil,1),{
 		Name = "Window",
 		Parent = GIFui_interface,
 		Size = UDim2.fromScale(.545,.5),
@@ -221,29 +224,21 @@ function GIFui.MakeWindow(WindowTitle:string)
 		Template("Ratio",1.505),
 	})
 	--
-	local WindowMain = SetProperties(Template("Canvas",nil,1),{
+	local WindowMain = SetProperties(Template("Canvas",Color3.fromRGB(24, 24, 27),0),{
 		Parent = WindowHandler,
 		Size = UDim2.fromScale(1,.9),
 		Position = UDim2.fromScale(.5,.1),
 		AnchorPoint = Vector2.new(.5,0),
 	})
-	local Background = SetChildren(SetProperties(Template("Frame",Color3.fromRGB(40,40,40),0),{
-		Parent = WindowMain,
-		Size = UDim2.fromScale(1,1),
-		Position = UDim2.fromScale(.5,.5),
-		AnchorPoint = Vector2.new(.5,.5),
-	}),{
-		Template("Gradient",Color3.fromRGB(209,209,209),Color3.fromRGB(89,89,89)),
-	})
 
-	local WindowTop = SetChildren(SetProperties(Template("Canvas",Color3.fromRGB(23,23,23)),{
+	local WindowTop = SetChildren(SetProperties(Template("Canvas",Color3.fromRGB(39, 39, 42),0),{
 		Parent = WindowHandler,
 		Size = UDim2.fromScale(1,.1),
 		Position = UDim2.fromScale(.5,0),
 		AnchorPoint = Vector2.new(.5,0),
 	}),{
 		SetProperties(Template("Text", WindowTitle),{
-			Size = UDim2.fromScale(.6,.6),
+			Size = UDim2.fromScale(.6,.5),
 			Position = UDim2.fromScale(.5,.5),
 			AnchorPoint = Vector2.new(.5,.5),
 		})
@@ -260,13 +255,12 @@ function GIFui.MakeWindow(WindowTitle:string)
 		}),
 	})
 
-	local HideButton = SetChildren(SetProperties(Template("Button",Color3.fromRGB(60,60,60),nil,.4),{
+	local HideButton = SetChildren(SetProperties(Template("Button",Color3.fromRGB(63, 63, 70),nil),{
 		Parent = TopButtonsHandler,
 		Size = UDim2.fromScale(.32,.582),
 		Position = UDim2.fromScale(0,0),
 		AnchorPoint = Vector2.new(0,0),
 	}),{
-		Template("Gradient",Color3.new(1,1,1),Color3.fromRGB(162,162,162)),
 		SetProperties(Template("Image","91869606000407"),{
 			Name = "Icon",
 			Size = UDim2.fromScale(.5,.8),
@@ -274,13 +268,12 @@ function GIFui.MakeWindow(WindowTitle:string)
 			AnchorPoint = Vector2.new(.5,.5),
 		}),
 	})
-	local CloseButton = SetChildren(SetProperties(Template("Button",Color3.fromRGB(60,60,60),nil,.4),{
+	local CloseButton = SetChildren(SetProperties(Template("Button",Color3.fromRGB(239, 68, 68),nil),{
 		Parent = TopButtonsHandler,
 		Size = UDim2.fromScale(.32,.582),
 		Position = UDim2.fromScale(0,0),
 		AnchorPoint = Vector2.new(0,0),
 	}),{
-		Template("Gradient",Color3.new(1,1,1),Color3.fromRGB(162,162,162)),
 		SetProperties(Template("Image","111103280193031"),{
 			Name = "Icon",
 			Size = UDim2.fromScale(1,1),
@@ -290,22 +283,35 @@ function GIFui.MakeWindow(WindowTitle:string)
 	})
 
 	--
-	local TabsHandler = SetChildren(SetProperties(Template("Scroll",Color3.new(0,0,0),.7),{
+	local TabsHandler = SetChildren(SetProperties(Template("Scroll",Color3.new(0,0,0),1),{
 		Parent = WindowMain,
 		Size = UDim2.fromScale(.25,1),
 		Position = UDim2.fromScale(0,0),
 		AnchorPoint = Vector2.new(0,0),
 	}),{
-		Template("List"),
+		Template("List", Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Top, 0.02),
 	})
+	-- Spacer for tabs
+	local TabsSpacer = SetProperties(Template("Frame",nil,1),{
+		Parent = TabsHandler,
+		Size = UDim2.fromScale(1,.02),
+		LayoutOrder = -1,
+	})
+
 	local OptionsHandler = SetChildren(SetProperties(Template("Scroll"),{
 		Parent = WindowMain,
 		Size = UDim2.fromScale(.75,1),
 		Position = UDim2.fromScale(.25,.5),
 		AnchorPoint = Vector2.new(0,.5),
 	}),{
-		Template("List"),
+		Template("List", Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Top, 0.02),
 	})
+	local OptionsSpacer = SetProperties(Template("Frame",nil,1),{
+		Parent = OptionsHandler,
+		Size = UDim2.fromScale(1,.02),
+		LayoutOrder = -1,
+	})
+	
 	--
 	local AssetsFolder = Create("Folder",{Name="Assets",Parent=WindowHandler})
 
@@ -317,18 +323,18 @@ function GIFui.MakeWindow(WindowTitle:string)
 		AnchorPoint = Vector2.new(.5,0),
 		Visible = false,
 	}),{
-		SetChildren(SetProperties(Template("Button",Color3.fromRGB(60,60,60),nil,1),{
+		SetChildren(SetProperties(Template("Button",Color3.fromRGB(39, 39, 42),nil),{
 			Name = "Button",
-			Size = UDim2.fromScale(.8,.6),
+			Size = UDim2.fromScale(1, 1),
 			Position = UDim2.fromScale(.5,.5),
 			AnchorPoint = Vector2.new(.5,.5),
 		}),{
-			Template("Gradient",Color3.new(1,1,1),Color3.fromRGB(162,162,162)),
 			SetProperties(Template("Text","Tab"),{
 				Name = "Title",
 				Size = UDim2.fromScale(.8,.65),
 				Position = UDim2.fromScale(.5,.5),
 				AnchorPoint = Vector2.new(.5,.5),
+				TextColor3 = Color3.fromRGB(161, 161, 170),
 			})
 		})
 	})
@@ -336,18 +342,17 @@ function GIFui.MakeWindow(WindowTitle:string)
 	local CheckOption = SetChildren(SetProperties(Template("Frame",nil,1),{
 		Parent = AssetsFolder,
 		Name = "CheckOption",
-		Size = UDim2.fromScale(.9,.2),
+		Size = UDim2.fromScale(.95,.2),
 		Position = UDim2.fromScale(0,0),
 		AnchorPoint = Vector2.new(.5,.5),
 		Visible = false,
 	}),{
-		SetChildren(SetProperties(Template("Canvas",Color3.fromRGB(60,60,60),nil,1),{
+		SetChildren(SetProperties(Template("Canvas",Color3.fromRGB(39, 39, 42),nil),{
 			Name = "Handler",
-			Size = UDim2.fromScale(1,.7),
+			Size = UDim2.fromScale(1,.9),
 			Position = UDim2.fromScale(.5,.5),
 			AnchorPoint = Vector2.new(.5,.5),
 		}),{
-			Template("Gradient",Color3.new(1,1,1),Color3.fromRGB(162,162,162)),
 			SetChildren(SetProperties(Template("Frame",nil,1),{
 				Name = "TitleHandler",
 				Size = UDim2.fromScale(.8,.9),
@@ -361,20 +366,19 @@ function GIFui.MakeWindow(WindowTitle:string)
 					Position = UDim2.fromScale(0,0),
 					AnchorPoint = Vector2.new(0,0),
 				}),
-				SetProperties(Template("Text","check swich option",Enum.TextXAlignment.Left,Color3.fromRGB(150,150,150)),{
+				SetProperties(Template("Text","check switch option",Enum.TextXAlignment.Left,Color3.fromRGB(161, 161, 170)),{
 					Name = "Tip",
 					Size = UDim2.fromScale(.8,.4),
 					Position = UDim2.fromScale(0,0),
 					AnchorPoint = Vector2.new(0,0),
 				}),
 			}),
-			SetChildren(SetProperties(Template("Button",Color3.fromRGB(40,40,40),nil,1),{
+			SetChildren(SetProperties(Template("Button",Color3.fromRGB(63, 63, 70),nil),{
 				Name = "Button",
-				Size = UDim2.fromScale(.1,.8),
-				Position = UDim2.fromScale(0.99,.5),
+				Size = UDim2.fromScale(.1,.7),
+				Position = UDim2.fromScale(0.975,.5),
 				AnchorPoint = Vector2.new(1,.5),
 			}),{
-				Template("Gradient",Color3.new(1,1,1),Color3.fromRGB(162,162,162)),
 				SetProperties(Template("Image","12690727184",1),{
 					Name = "Icon",
 					Size = UDim2.fromScale(.6,.6),
@@ -388,18 +392,17 @@ function GIFui.MakeWindow(WindowTitle:string)
 	local ClickOption = SetChildren(SetProperties(Template("Frame",nil,1),{
 		Parent = AssetsFolder,
 		Name = "ClickOption",
-		Size = UDim2.fromScale(.9,.2),
+		Size = UDim2.fromScale(.95,.2),
 		Position = UDim2.fromScale(0,0),
 		AnchorPoint = Vector2.new(.5,.5),
 		Visible = false,
 	}),{
-		SetChildren(SetProperties(Template("Canvas",Color3.fromRGB(60,60,60),nil,1),{
+		SetChildren(SetProperties(Template("Canvas",Color3.fromRGB(39, 39, 42),nil),{
 			Name = "Handler",
-			Size = UDim2.fromScale(1,.7),
+			Size = UDim2.fromScale(1,.9),
 			Position = UDim2.fromScale(.5,.5),
 			AnchorPoint = Vector2.new(.5,.5),
 		}),{
-			Template("Gradient",Color3.new(1,1,1),Color3.fromRGB(162,162,162)),
 			SetChildren(SetProperties(Template("Frame",nil,1),{
 				Name = "TitleHandler",
 				Size = UDim2.fromScale(.8,.9),
@@ -413,23 +416,22 @@ function GIFui.MakeWindow(WindowTitle:string)
 					Position = UDim2.fromScale(0,0),
 					AnchorPoint = Vector2.new(0,0),
 				}),
-				SetProperties(Template("Text","just click",Enum.TextXAlignment.Left,Color3.fromRGB(150,150,150)),{
+				SetProperties(Template("Text","just click",Enum.TextXAlignment.Left,Color3.fromRGB(161, 161, 170)),{
 					Name = "Tip",
 					Size = UDim2.fromScale(.8,.4),
 					Position = UDim2.fromScale(0,0),
 					AnchorPoint = Vector2.new(0,0),
 				}),
 			}),
-			SetChildren(SetProperties(Template("Button",Color3.fromRGB(40,40,40),nil,1),{
+			SetChildren(SetProperties(Template("Button",Color3.fromRGB(63, 63, 70),nil),{
 				Name = "Button",
-				Size = UDim2.fromScale(.1,.8),
-				Position = UDim2.fromScale(0.99,.5),
+				Size = UDim2.fromScale(.1,.7),
+				Position = UDim2.fromScale(0.975,.5),
 				AnchorPoint = Vector2.new(1,.5),
 			}),{
-				Template("Gradient",Color3.new(1,1,1),Color3.fromRGB(162,162,162)),
 				SetProperties(Template("Image","12333784627"),{
 					Name = "Icon",
-					Size = UDim2.fromScale(.8,.8),
+					Size = UDim2.fromScale(.7,.7),
 					Position = UDim2.fromScale(0.5,.5),
 					AnchorPoint = Vector2.new(.5,.5),
 				})
@@ -440,45 +442,44 @@ function GIFui.MakeWindow(WindowTitle:string)
 	local InputOption = SetChildren(SetProperties(Template("Frame",nil,1),{
 		Parent = AssetsFolder,
 		Name = "InputOption",
-		Size = UDim2.fromScale(.9,.2),
+		Size = UDim2.fromScale(.95,.2),
 		Position = UDim2.fromScale(0,0),
 		AnchorPoint = Vector2.new(.5,.5),
 		Visible = false,
 	}),{
-		SetChildren(SetProperties(Template("Canvas",Color3.fromRGB(60,60,60),nil,1),{
+		SetChildren(SetProperties(Template("Canvas",Color3.fromRGB(39, 39, 42),nil),{
 			Name = "Handler",
-			Size = UDim2.fromScale(1,.7),
+			Size = UDim2.fromScale(1,.9),
 			Position = UDim2.fromScale(.5,.5),
 			AnchorPoint = Vector2.new(.5,.5),
 		}),{
-			Template("Gradient",Color3.new(1,1,1),Color3.fromRGB(162,162,162)),
 			SetChildren(SetProperties(Template("Frame",nil,1),{
 				Name = "TitleHandler",
-				Size = UDim2.fromScale(.8,.9),
+				Size = UDim2.fromScale(.55,.9),
 				Position = UDim2.fromScale(.05,.5),
 				AnchorPoint = Vector2.new(0,.5),
 			}),{
 				Template("List",Enum.HorizontalAlignment.Left,Enum.VerticalAlignment.Center),
 				SetProperties(Template("Text","Option",Enum.TextXAlignment.Left),{
 					Name = "Title",
-					Size = UDim2.fromScale(.8,.5),
+					Size = UDim2.fromScale(1,.5),
 					Position = UDim2.fromScale(0,0),
 					AnchorPoint = Vector2.new(0,0),
 				}),
-				SetProperties(Template("Text","just click",Enum.TextXAlignment.Left,Color3.fromRGB(150,150,150)),{
+				SetProperties(Template("Text","input value",Enum.TextXAlignment.Left,Color3.fromRGB(161, 161, 170)),{
 					Name = "Tip",
-					Size = UDim2.fromScale(.8,.4),
+					Size = UDim2.fromScale(1,.4),
 					Position = UDim2.fromScale(0,0),
 					AnchorPoint = Vector2.new(0,0),
 				}),
 			}),
-			SetChildren(SetProperties(Template("Input",Color3.fromRGB(40,40,40),"Input",1),{
+			SetChildren(SetProperties(Template("Input",Color3.fromRGB(24, 24, 27),"Input"),{
 				Name = "Button",
 				Size = UDim2.fromScale(.38,.6),
 				Position = UDim2.fromScale(0.975,.5),
 				AnchorPoint = Vector2.new(1,.5),
 			}),{
-				Template("Gradient",Color3.new(1,1,1),Color3.fromRGB(162,162,162))
+				-- empty
 			})
 		})
 	})
@@ -516,8 +517,10 @@ function GIFui.MakeWindow(WindowTitle:string)
 		IsHide = not IsHide
 		if IsHide then
 			Window:Hide()
+			Services.Tween:Create(HideButton, TweenInfo.new(.2), {BackgroundColor3=Color3.fromRGB(74, 222, 128)}):Play()
 		else
 			Window:Show()
+			Services.Tween:Create(HideButton, TweenInfo.new(.2), {BackgroundColor3=Color3.fromRGB(63, 63, 70)}):Play()
 		end
 	end)
 	Window:AddConnection(CloseButton.MouseButton1Click, function()
@@ -572,7 +575,11 @@ function GIFui.MakeWindow(WindowTitle:string)
 		local function Activate()
 			for _,OtherElement in pairs(OptionsHandler:GetChildren()) do
 				if not OtherElement:IsA("GuiBase") then continue end
-				OtherElement.Visible = false
+				if OtherElement.Name == "TabTitle" then
+					OtherElement.Visible = false
+				else
+					OtherElement.Visible = false
+				end
 			end
 			for _,MyElement in pairs(NewTab.Elements) do
 				if not MyElement["Build"] then continue end
@@ -588,11 +595,11 @@ function GIFui.MakeWindow(WindowTitle:string)
 		Window:AddConnection(Services.Run.RenderStepped, function()
 			if self.CurrentTab~=NewTab then return end
 			Activate()
-			Services.Tween:Create(NewTab.Build.Base,TweenInfo.new(TweenTime/2),{Size=UDim2.fromScale(1.1,.2)}):Play()
-			Services.Tween:Create(NewTab.Build.Title,TweenInfo.new(TweenTime/2),{TextColor3=Color3.fromRGB(115, 255, 83)}):Play()
+			Services.Tween:Create(NewTab.Build.Button,TweenInfo.new(TweenTime),{BackgroundColor3=Color3.fromRGB(63, 63, 70)}):Play()
+			Services.Tween:Create(NewTab.Build.Title,TweenInfo.new(TweenTime),{TextColor3=Color3.fromRGB(250, 250, 250)}):Play()
 			repeat wait() until self.CurrentTab~=NewTab
-			Services.Tween:Create(NewTab.Build.Base,TweenInfo.new(TweenTime/2),{Size=UDim2.fromScale(.9,.15)}):Play()
-			Services.Tween:Create(NewTab.Build.Title,TweenInfo.new(TweenTime/2),{TextColor3=Color3.new(1,1,1)}):Play()
+			Services.Tween:Create(NewTab.Build.Button,TweenInfo.new(TweenTime),{BackgroundColor3=Color3.fromRGB(39, 39, 42)}):Play()
+			Services.Tween:Create(NewTab.Build.Title,TweenInfo.new(TweenTime),{TextColor3=Color3.fromRGB(161, 161, 170)}):Play()
 		end)
 
 		--Options
@@ -649,13 +656,13 @@ function GIFui.MakeWindow(WindowTitle:string)
 						if OptionConfigs.CallBack.On then
 							OptionConfigs.CallBack.On()
 						end
-						Services.Tween:Create(Button,TweenInfo.new(TweenTime),{BackgroundColor3=Color3.fromRGB(115, 255, 83)}):Play()
-						Services.Tween:Create(Title,TweenInfo.new(TweenTime),{TextColor3=Color3.fromRGB(115, 255, 83)}):Play()
+						Services.Tween:Create(Button,TweenInfo.new(TweenTime),{BackgroundColor3=Color3.fromRGB(74, 222, 128)}):Play()
+						Services.Tween:Create(Title,TweenInfo.new(TweenTime),{TextColor3=Color3.fromRGB(74, 222, 128)}):Play()
 					else
 						if OptionConfigs.CallBack.Off then
 							OptionConfigs.CallBack.Off()
 						end
-						Services.Tween:Create(Button,TweenInfo.new(TweenTime),{BackgroundColor3=Color3.fromRGB(40, 40, 40)}):Play()
+						Services.Tween:Create(Button,TweenInfo.new(TweenTime),{BackgroundColor3=Color3.fromRGB(63, 63, 70)}):Play()
 						Services.Tween:Create(Title,TweenInfo.new(TweenTime),{TextColor3=Color3.new(1, 1, 1)}):Play()
 					end
 				end
@@ -681,10 +688,10 @@ function GIFui.MakeWindow(WindowTitle:string)
 					if OptionConfigs.CallBack.Click then
 						OptionConfigs.CallBack.Click()
 					end
-					Services.Tween:Create(Button,TweenInfo.new(TweenTime/2),{BackgroundColor3=Color3.fromRGB(115, 255, 83)}):Play()
-					Services.Tween:Create(Title,TweenInfo.new(TweenTime),{TextColor3=Color3.fromRGB(115, 255, 83)}):Play()
+					Services.Tween:Create(Button,TweenInfo.new(TweenTime/2),{BackgroundColor3=Color3.fromRGB(74, 222, 128)}):Play()
+					Services.Tween:Create(Title,TweenInfo.new(TweenTime),{TextColor3=Color3.fromRGB(74, 222, 128)}):Play()
 					task.wait(TweenTime/2)
-					Services.Tween:Create(Button,TweenInfo.new(TweenTime),{BackgroundColor3=Color3.fromRGB(40, 40, 40)}):Play()
+					Services.Tween:Create(Button,TweenInfo.new(TweenTime),{BackgroundColor3=Color3.fromRGB(63, 63, 70)}):Play()
 					Services.Tween:Create(Title,TweenInfo.new(TweenTime),{TextColor3=Color3.new(1, 1, 1)}):Play()
 				end
 
@@ -701,13 +708,13 @@ function GIFui.MakeWindow(WindowTitle:string)
 					if OptionConfigs.CallBack.Changed then
 						OptionConfigs.CallBack.Changed(tostring(Button.Text))
 					end
-					Services.Tween:Create(Button,TweenInfo.new(TweenTime/2),{BackgroundColor3=Color3.fromRGB(115, 255, 83)}):Play()
-					Services.Tween:Create(Title,TweenInfo.new(TweenTime),{TextColor3=Color3.fromRGB(115, 255, 83)}):Play()
-					Services.Tween:Create(Button,TweenInfo.new(TweenTime),{PlaceholderColor3=Color3.fromRGB(115+25, 255+25, 83+25)}):Play()
+					Services.Tween:Create(Button,TweenInfo.new(TweenTime/2),{BackgroundColor3=Color3.fromRGB(63, 63, 70)}):Play()
+					Services.Tween:Create(Title,TweenInfo.new(TweenTime),{TextColor3=Color3.fromRGB(74, 222, 128)}):Play()
+					Services.Tween:Create(Button,TweenInfo.new(TweenTime),{PlaceholderColor3=Color3.fromRGB(250, 250, 250)}):Play()
 					task.wait(TweenTime/2)
-					Services.Tween:Create(Button,TweenInfo.new(TweenTime),{BackgroundColor3=Color3.fromRGB(40, 40, 40)}):Play()
+					Services.Tween:Create(Button,TweenInfo.new(TweenTime),{BackgroundColor3=Color3.fromRGB(24, 24, 27)}):Play()
 					Services.Tween:Create(Title,TweenInfo.new(TweenTime),{TextColor3=Color3.new(1, 1, 1)}):Play()
-					Services.Tween:Create(Button,TweenInfo.new(TweenTime),{PlaceholderColor3=Color3.fromRGB(65, 65, 65)}):Play()
+					Services.Tween:Create(Button,TweenInfo.new(TweenTime),{PlaceholderColor3=Color3.fromRGB(161, 161, 170)}):Play()
 				end
 
 				Window:AddConnection(Button.Changed, function(Property)
@@ -743,7 +750,8 @@ function GIFui.MakeWindow(WindowTitle:string)
 			local NewTitle = {
 				Build = {
 					Base = SetProperties(Template("Text","Title", PosX or Enum.TextXAlignment.Left),{
-						Size = UDim2.fromScale(.9,.1),
+						Name = "TabTitle",
+						Size = UDim2.fromScale(.95,.08),
 						Position = UDim2.fromScale(0,0),
 						AnchorPoint = Vector2.new(0,0),
 						Visible = false,
@@ -752,7 +760,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 				Text = tostring(Text or ""),
 			}
 			NewTitle.Build.Base.Text = NewTitle.Text
-			NewTitle.Build.Base.TextColor3 = Color or Color3.new(1,1,1)
+			NewTitle.Build.Base.TextColor3 = Color or Color3.fromRGB(161, 161, 170)
 			NewTitle.Build.Base.Parent = OptionsHandler
 			--
 			table.insert(self.Elements, NewTitle)
@@ -763,7 +771,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 			local NewSpace = {
 				Build = {
 					Base = SetProperties(Template("Frame",nil,1),{
-						Size = UDim2.fromScale(1,.1),
+						Size = UDim2.fromScale(1,.05),
 						Position = UDim2.fromScale(0,0),
 						AnchorPoint = Vector2.new(0,0),
 						Visible = false,
