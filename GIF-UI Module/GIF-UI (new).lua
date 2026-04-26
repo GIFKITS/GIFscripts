@@ -223,29 +223,41 @@ function GIFui.MakeWindow(WindowTitle:string)
 	}
 
 	--
-	local WindowHandler = SetChildren(SetProperties(Template("Canvas",Color3.fromRGB(24, 24, 27),1),{
+	local WindowHandler = SetChildren(SetProperties(Template("Frame",Color3.fromRGB(24, 24, 27),1,0),{
 		Name = "Window",
 		Parent = GIFui_interface,
 		Size = UDim2.fromScale(.545,.5),
 		Position = UDim2.fromScale(.5,.5),
 		AnchorPoint = Vector2.new(.5,.5),
+		ClipsDescendants = true,
 	}),{
 		Template("Ratio",1.505),
 	})
 	--
-	local WindowMain = SetProperties(Template("Frame",Color3.fromRGB(24, 24, 27),0,0),{
+	local WindowMain = SetChildren(SetProperties(Template("Frame",Color3.fromRGB(24, 24, 27),0,6),{
 		Parent = WindowHandler,
 		Size = UDim2.fromScale(1,.9),
 		Position = UDim2.fromScale(.5,.1),
 		AnchorPoint = Vector2.new(.5,0),
+	}),{
+		SetProperties(Template("Frame",Color3.fromRGB(24, 24, 27),0,0),{
+			Size = UDim2.fromScale(1,.05),
+			Position = UDim2.fromScale(.5,0),
+			AnchorPoint = Vector2.new(.5,0),
+		}),
 	})
 
-	local WindowTop = SetChildren(SetProperties(Template("Frame",Color3.fromRGB(39, 39, 42),0,0),{
+	local WindowTop = SetChildren(SetProperties(Template("Frame",Color3.fromRGB(39, 39, 42),0,6),{
 		Parent = WindowHandler,
 		Size = UDim2.fromScale(1,.1),
 		Position = UDim2.fromScale(.5,0),
 		AnchorPoint = Vector2.new(.5,0),
 	}),{
+		SetProperties(Template("Frame",Color3.fromRGB(39, 39, 42),0,0),{
+			Size = UDim2.fromScale(1,.5),
+			Position = UDim2.fromScale(.5,1),
+			AnchorPoint = Vector2.new(.5,1),
+		}),
 		SetProperties(Template("Text", WindowTitle),{
 			Size = UDim2.fromScale(.6,.5),
 			Position = UDim2.fromScale(.5,.5),
