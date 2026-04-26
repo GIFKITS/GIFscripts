@@ -76,7 +76,7 @@ AddTemplate("Canvas", function(Color, Transparency, CornerSize)
 		BackgroundColor3 = Color or Color3.fromRGB(24, 24, 27),
 	},{
 		Create("UICorner",{
-			CornerRadius = UDim.new(CornerSize or 0, 6),
+			CornerRadius = UDim.new(0, CornerSize ~= nil and CornerSize or 6),
 		})
 	})
 	return Object
@@ -88,7 +88,7 @@ AddTemplate("Frame", function(Color, Transparency, CornerSize)
 		BackgroundColor3 = Color or Color3.fromRGB(24, 24, 27),
 	},{
 		Create("UICorner",{
-			CornerRadius = UDim.new(CornerSize or 0, 6),
+			CornerRadius = UDim.new(0, CornerSize ~= nil and CornerSize or 6),
 		})
 	})
 	return Object
@@ -105,7 +105,7 @@ AddTemplate("Input", function(Color, Placeholder, CornerSize)
 		BackgroundColor3 = Color or Color3.fromRGB(39, 39, 42),
 	},{
 		Create("UICorner",{
-			CornerRadius = UDim.new(CornerSize or 0, 6),
+			CornerRadius = UDim.new(0, CornerSize ~= nil and CornerSize or 6),
 		})
 	})
 	return Object
@@ -123,7 +123,7 @@ AddTemplate("Button", function(Color, Transparency, CornerSize)
 		AutoButtonColor = true,
 	},{
 		Create("UICorner",{
-			CornerRadius = UDim.new(CornerSize or 0, 6),
+			CornerRadius = UDim.new(0, CornerSize ~= nil and CornerSize or 6),
 		})
 	})
 	return Object
@@ -189,6 +189,15 @@ AddTemplate("List", function(Xpos, Ypos, Padding)
 	})
 	return Object
 end)
+AddTemplate("Padding", function(Top, Bottom, Left, Right)
+	local Object = Create("UIPadding",{
+		PaddingTop = UDim.new(Top or 0, 0),
+		PaddingBottom = UDim.new(Bottom or 0, 0),
+		PaddingLeft = UDim.new(Left or 0, 0),
+		PaddingRight = UDim.new(Right or 0, 0),
+	})
+	return Object
+end)
 
 --Player--
 local Player = Services.Players.LocalPlayer
@@ -214,7 +223,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 	}
 
 	--
-	local WindowHandler = SetChildren(SetProperties(Template("Canvas",nil,1),{
+	local WindowHandler = SetChildren(SetProperties(Template("Canvas",Color3.fromRGB(24, 24, 27),0),{
 		Name = "Window",
 		Parent = GIFui_interface,
 		Size = UDim2.fromScale(.545,.5),
@@ -224,14 +233,14 @@ function GIFui.MakeWindow(WindowTitle:string)
 		Template("Ratio",1.505),
 	})
 	--
-	local WindowMain = SetProperties(Template("Canvas",Color3.fromRGB(24, 24, 27),0),{
+	local WindowMain = SetProperties(Template("Frame",Color3.fromRGB(24, 24, 27),1,0),{
 		Parent = WindowHandler,
 		Size = UDim2.fromScale(1,.9),
 		Position = UDim2.fromScale(.5,.1),
 		AnchorPoint = Vector2.new(.5,0),
 	})
 
-	local WindowTop = SetChildren(SetProperties(Template("Canvas",Color3.fromRGB(39, 39, 42),0),{
+	local WindowTop = SetChildren(SetProperties(Template("Frame",Color3.fromRGB(39, 39, 42),0,0),{
 		Parent = WindowHandler,
 		Size = UDim2.fromScale(1,.1),
 		Position = UDim2.fromScale(.5,0),
@@ -285,31 +294,24 @@ function GIFui.MakeWindow(WindowTitle:string)
 	--
 	local TabsHandler = SetChildren(SetProperties(Template("Scroll",Color3.new(0,0,0),1),{
 		Parent = WindowMain,
-		Size = UDim2.fromScale(.25,1),
+		Size = UDim2.fromScale(.28,1),
 		Position = UDim2.fromScale(0,0),
 		AnchorPoint = Vector2.new(0,0),
+		ScrollBarThickness = 0,
 	}),{
-		Template("List", Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Top, 0.02),
-	})
-	-- Spacer for tabs
-	local TabsSpacer = SetProperties(Template("Frame",nil,1),{
-		Parent = TabsHandler,
-		Size = UDim2.fromScale(1,.02),
-		LayoutOrder = -1,
+		Template("List", Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Top, 0.03),
+		Template("Padding", 0.04, 0.04, 0, 0),
 	})
 
 	local OptionsHandler = SetChildren(SetProperties(Template("Scroll"),{
 		Parent = WindowMain,
-		Size = UDim2.fromScale(.75,1),
-		Position = UDim2.fromScale(.25,.5),
+		Size = UDim2.fromScale(.72,1),
+		Position = UDim2.fromScale(.28,.5),
 		AnchorPoint = Vector2.new(0,.5),
+		ScrollBarThickness = 2,
 	}),{
-		Template("List", Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Top, 0.02),
-	})
-	local OptionsSpacer = SetProperties(Template("Frame",nil,1),{
-		Parent = OptionsHandler,
-		Size = UDim2.fromScale(1,.02),
-		LayoutOrder = -1,
+		Template("List", Enum.HorizontalAlignment.Center, Enum.VerticalAlignment.Top, 0.03),
+		Template("Padding", 0.04, 0.04, 0.02, 0.02),
 	})
 	
 	--
@@ -342,7 +344,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 	local CheckOption = SetChildren(SetProperties(Template("Frame",nil,1),{
 		Parent = AssetsFolder,
 		Name = "CheckOption",
-		Size = UDim2.fromScale(.95,.2),
+		Size = UDim2.fromScale(1,.2),
 		Position = UDim2.fromScale(0,0),
 		AnchorPoint = Vector2.new(.5,.5),
 		Visible = false,
@@ -371,12 +373,16 @@ function GIFui.MakeWindow(WindowTitle:string)
 					Size = UDim2.fromScale(.8,.4),
 					Position = UDim2.fromScale(0,0),
 					AnchorPoint = Vector2.new(0,0),
+					TextScaled = false,
+					TextSize = 13,
+					TextWrapped = true,
+					TextYAlignment = Enum.TextYAlignment.Top,
 				}),
 			}),
 			SetChildren(SetProperties(Template("Button",Color3.fromRGB(63, 63, 70),nil),{
 				Name = "Button",
 				Size = UDim2.fromScale(.1,.7),
-				Position = UDim2.fromScale(0.975,.5),
+				Position = UDim2.fromScale(0.96,.5),
 				AnchorPoint = Vector2.new(1,.5),
 			}),{
 				SetProperties(Template("Image","12690727184",1),{
@@ -392,7 +398,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 	local ClickOption = SetChildren(SetProperties(Template("Frame",nil,1),{
 		Parent = AssetsFolder,
 		Name = "ClickOption",
-		Size = UDim2.fromScale(.95,.2),
+		Size = UDim2.fromScale(1,.2),
 		Position = UDim2.fromScale(0,0),
 		AnchorPoint = Vector2.new(.5,.5),
 		Visible = false,
@@ -421,12 +427,16 @@ function GIFui.MakeWindow(WindowTitle:string)
 					Size = UDim2.fromScale(.8,.4),
 					Position = UDim2.fromScale(0,0),
 					AnchorPoint = Vector2.new(0,0),
+					TextScaled = false,
+					TextSize = 13,
+					TextWrapped = true,
+					TextYAlignment = Enum.TextYAlignment.Top,
 				}),
 			}),
 			SetChildren(SetProperties(Template("Button",Color3.fromRGB(63, 63, 70),nil),{
 				Name = "Button",
 				Size = UDim2.fromScale(.1,.7),
-				Position = UDim2.fromScale(0.975,.5),
+				Position = UDim2.fromScale(0.96,.5),
 				AnchorPoint = Vector2.new(1,.5),
 			}),{
 				SetProperties(Template("Image","12333784627"),{
@@ -442,7 +452,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 	local InputOption = SetChildren(SetProperties(Template("Frame",nil,1),{
 		Parent = AssetsFolder,
 		Name = "InputOption",
-		Size = UDim2.fromScale(.95,.2),
+		Size = UDim2.fromScale(1,.2),
 		Position = UDim2.fromScale(0,0),
 		AnchorPoint = Vector2.new(.5,.5),
 		Visible = false,
@@ -455,7 +465,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 		}),{
 			SetChildren(SetProperties(Template("Frame",nil,1),{
 				Name = "TitleHandler",
-				Size = UDim2.fromScale(.55,.9),
+				Size = UDim2.fromScale(.5,.9),
 				Position = UDim2.fromScale(.05,.5),
 				AnchorPoint = Vector2.new(0,.5),
 			}),{
@@ -471,12 +481,16 @@ function GIFui.MakeWindow(WindowTitle:string)
 					Size = UDim2.fromScale(1,.4),
 					Position = UDim2.fromScale(0,0),
 					AnchorPoint = Vector2.new(0,0),
+					TextScaled = false,
+					TextSize = 13,
+					TextWrapped = true,
+					TextYAlignment = Enum.TextYAlignment.Top,
 				}),
 			}),
 			SetChildren(SetProperties(Template("Input",Color3.fromRGB(24, 24, 27),"Input"),{
 				Name = "Button",
 				Size = UDim2.fromScale(.38,.6),
-				Position = UDim2.fromScale(0.975,.5),
+				Position = UDim2.fromScale(0.96,.5),
 				AnchorPoint = Vector2.new(1,.5),
 			}),{
 				-- empty
@@ -751,7 +765,7 @@ function GIFui.MakeWindow(WindowTitle:string)
 				Build = {
 					Base = SetProperties(Template("Text","Title", PosX or Enum.TextXAlignment.Left),{
 						Name = "TabTitle",
-						Size = UDim2.fromScale(.95,.08),
+						Size = UDim2.fromScale(1,.08),
 						Position = UDim2.fromScale(0,0),
 						AnchorPoint = Vector2.new(0,0),
 						Visible = false,
