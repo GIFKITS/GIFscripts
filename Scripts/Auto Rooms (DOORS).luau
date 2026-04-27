@@ -5,6 +5,7 @@ local pathfinding = game:GetService("PathfindingService")
 local players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
 local run = game:GetService("RunService")
+local virtualUser = game:GetService("VirtualUser")
 
 -- PLAYER --
 
@@ -130,6 +131,10 @@ end
 
 local fullbrightEnabled = false
 
+-- ANTI AFK --
+
+local antiAFKenabled = false
+
 -- SPEED BOOST --
 
 local speedBoost = 0
@@ -140,64 +145,45 @@ local GIFui
 if run:IsStudio() then
 	GIFui = require(RS:FindFirstChild("GIFui"))
 else
-	GIFui = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/GIFscripts/refs/heads/main/GIF-UI%20Module/GIF-UI%20(new).lua"))()
+	GIFui = loadstring(game:HttpGet("https://raw.githubusercontent.com/GIFKITS/gifkits/refs/heads/main/lib/GIFui.luau"))()
 end
 
-local window = GIFui.MakeWindow("rooms auto walk")
-window:AddConnection(player.CharacterAdded, updateCharacter)
+local window = GIFui:CreateWindow("rooms auto walk")
+table.insert(window._conns,player.CharacterAdded:Connect(updateCharacter))
 
-local mainTab = window:MakeTab("Main")
+local mainTab = window:CreateTab("Main")
 window.CurrentTab = mainTab
 
-mainTab:MakeOption({
-	Type = "Check",
-	Title = "Auto Walk (fly)",
-	Tip = "pass rooms automatically",
+mainTab:CreateToggle("Auto Walk (fly)","pass rooms automatically",autoWalkEnabled,function(value)
+	autoWalkEnabled = value
+	if value then
+		workspace.Gravity = 0
+	else
+		workspace.Gravity = originalGravity
+	end
+end)
 
-	CallBack = {
-		On = function()
-			autoWalkEnabled = true
-			workspace.Gravity = 0
-		end,
+mainTab:CreateToggle("Fullbright","you can see in the dark",fullbrightEnabled,function(value)
+	fullbrightEnabled = value
+end)
 
-		Off = function()
-			autoWalkEnabled = false
-			workspace.Gravity = originalGravity
-		end,
-	},
-})
+mainTab:CreateToggle("Anti-AFK","you won't be kicked after 20 mins",antiAFKenabled,function(value)
+	antiAFKenabled = value
+end)
 
-mainTab:MakeOption({
-	Type = "Check",
-	Title = "Fullbright",
-	Tip = "you can see in the dark",
+mainTab:CreateInput("Speed Boost","speed up (7-6 recommended)",function(value)
+	speedBoost = value or 0
+end)
 
-	CallBack = {
-		On = function()
-			fullbrightEnabled = true
-		end,
+-- CONNECTIONS --
 
-		Off = function()
-			fullbrightEnabled = false
-		end,
-	},
-})
+table.insert(window._conns,player.Idled:Connect(function()
+	if not antiAFKenabled then return end
+	virtualUser:CaptureController()
+	virtualUser:ClickButton2(Vector2.new())
+end))
 
-mainTab:MakeOption({
-	Type = "Input",
-	Title = "Speed Boost",
-	Tip = "speed up (7-6 recommended)",
-
-	CallBack = {
-		Changed = function(value)
-			speedBoost = value or 0
-		end,
-	},
-})
-
--- RUN --
-
-window:AddConnection(run.RenderStepped, function(deltaTime)
+table.insert(window._conns,run.RenderStepped:Connect(function(deltaTime)
 	character:SetAttribute("SpeedBoost", speedBoost)
 
 	if fullbrightEnabled then
@@ -271,4 +257,4 @@ window:AddConnection(run.RenderStepped, function(deltaTime)
 			root.CFrame = CFrame.new(newPos, newPos + root.CFrame.LookVector)
 		end
 	end
-end)
+end))
